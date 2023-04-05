@@ -360,3 +360,35 @@ import { PostUsers } from './middlewares/users.js';
         console.log('Server is running on port 5000');
     });
 ```
+## Criando arquivos json para armazenar os dados
+Vamos criar um arquivo chamado **users.json** na pasta **src** e vamos criar um array de objetos com os usuários.
+Depois de criar o arquivo na raiz do projeto e nomea-lo de **db.js**, vamos simular uma estrutura de banco de dados com os métodos `insert`, `select`.
+Dessa maneira os dados não vão ficar armazenados na memória, mas sim em um arquivo json, o que é muito mais seguro já que os dados não vão sumir quando o servidor for reiniciado. Mais tarde vamos entrar realmente em banco de dados, mas por enquanto vamos usar o arquivo json para simular um banco de dados.
+```js
+// src/db.js
+export class Database{
+    database = {}
+
+    select(table){
+        return this.database[table] ?? []
+    }
+    insert(table, data){
+        if(this.database[table]){
+            this.database[table].push(data)
+        }else{
+            this.database[table] = [data]
+        }
+        return data
+    }
+}
+```
+Nesse código acima, estamos criando uma classe chamada **Database** e dentro dela temos um método chamado **select** que recebe como parâmetro o nome da tabela e retorna os dados dessa tabela, caso não exista a tabela ele retorna um array vazio.
+E também temos o método **insert** que recebe como parâmetro o nome da tabela e os dados que serão inseridos, caso a tabela não exista ele cria a tabela e insere os dados, caso a tabela já exista ele insere os dados na tabela.
+Agora vamos importar o arquivo **db.js** no arquivo **server.js** e vamos usar o método **select** para retornar os dados da tabela **users**.
+
+## Separando Rotas
+Agora que já temos um middleware para validar os dados, podemos separar as rotas em um arquivo separado, assim temos um código mais organizado e com isso uma manutenção mais fácil.
+Primeiro vamos criar um arquivo chamado **routes.js** na pasta **src** e vamos criar um array de objetos com as rotas e seus respectivos métodos.
+```js
+// src/routes.js
+```
