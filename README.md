@@ -298,10 +298,10 @@ server.listen(5000, () => {
 ```
 Isso fará com que o servidor escute na porta 5000 e exiba a mensagem "Server is running on port 5000" no console.
 
-### Middlewares
+## Middlewares
 Um middleware é uma função que tem acesso ao objeto de solicitação **(req)**, ao objeto de resposta **(res)** e à próxima função de middleware no ciclo de solicitação-resposta do aplicativo. O middleware pode executar qualquer código, modificar os objetos de solicitação e resposta, encerrar o ciclo de solicitação-resposta e chamar a próxima função de middleware na pilha.
 Podemos simplificar e dizer que um middleware é uma função que ocorre entre a requisição do cliente e a resposta do servidor. Podendo fazer muitas coisas, como por exemplo, interceptar uma requisição, fazer alguma validação, fazer alguma alteração no objeto de requisição entre outros.
-#### Projeto Middleware
+### Projeto Middleware
 Vamos voltar para o projeto que estamos trabalhando e criar um middleware para que o usuário coloque o nome e idade no **body** da requisição e para verificar se existe um nome igual já cadastrado, caso já tenha ele deve retornar um erro.
 Um middleware fica separado do código em uma pasta chamada **middlewares**, assim temos uma organização melhor do código e com isso uma manutenção mais fácil!.
 
