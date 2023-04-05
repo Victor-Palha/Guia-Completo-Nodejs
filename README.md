@@ -187,10 +187,10 @@ OBS: Para usar o comando `import` no Node.js precisamos adicionar o seguinte có
     console.log(buffer);
 ```
 
-### Introdução às Streams no Node.js
+## Introdução às Streams no Node.js
 O Node.js é uma plataforma que fornece muitas funcionalidades úteis para lidar com I/O (entrada/saída), incluindo o uso de Streams. Uma Stream é uma sequência de dados que pode ser lida ou escrita em pedaços, em vez de lida ou escrita de uma só vez. O uso de Streams permite que o Node.js processe grandes volumes de dados de maneira eficiente, sem sobrecarregar a memória.
 
-#### Módulos Readable e Writable
+### Módulos Readable e Writable
 No Node.js, existem dois módulos principais para trabalhar com Streams: Readable e Writable.
 
 O módulo Readable é usado para ler dados de uma fonte, como um arquivo ou uma conexão de rede. Ele fornece vários métodos úteis para ler dados de uma Stream, incluindo:
@@ -203,7 +203,7 @@ O módulo Writable é usado para gravar dados em uma Stream, como um arquivo ou 
 * write(): escreve dados em uma Stream
 * end(): sinaliza o final dos dados na Stream
 
-#### Comandos Pipe e Push
+### Comandos Pipe e Push
 O método pipe() é um método de conveniência para encadear uma Stream Readable com uma Stream Writable. Ele permite que você leia os dados de uma Stream Readable e os escreva diretamente em uma Stream Writable. Aqui está um exemplo:
 
 ```js
@@ -236,7 +236,7 @@ readableStream.on('data', (chunk) => {
 
 Neste exemplo, estamos criando uma Stream Readable personalizada que adiciona os dados "hello " e "world" à Stream usando o método push(). Quando os dados são adicionados à Stream, a função de retorno de chamada read() é chamada e podemos ler os dados usando o método on('data'). No exemplo acima, estamos imprimindo os dados no console. O resultado da execução deste código será a string "hello world".
 
-#### Exemplo Readable Streams
+### Exemplo Readable Streams
 ```js
     import fs from 'node:fs';
     import http from 'node:http';
