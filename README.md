@@ -295,4 +295,67 @@ server.listen(5000, () => {
   console.log('Server is running on port 5000');
 });
 ```
-Isso fará com que o servidor escute na porta 5000 e exiba a mensagem "Server is running on port 5000" no console. 
+Isso fará com que o servidor escute na porta 5000 e exiba a mensagem "Server is running on port 5000" no console.
+
+### Middlewares
+Um middleware é uma função que tem acesso ao objeto de solicitação **(req)**, ao objeto de resposta **(res)** e à próxima função de middleware no ciclo de solicitação-resposta do aplicativo. O middleware pode executar qualquer código, modificar os objetos de solicitação e resposta, encerrar o ciclo de solicitação-resposta e chamar a próxima função de middleware na pilha.
+Podemos simplificar e dizer que um middleware é uma função que ocorre entre a requisição do cliente e a resposta do servidor. Podendo fazer muitas coisas, como por exemplo, interceptar uma requisição, fazer alguma validação, fazer alguma alteração no objeto de requisição entre outros.
+#### Projeto Middleware
+Vamos voltar para o projeto que estamos trabalhando e criar um middleware para que o usuário coloque o nome e idade no **body** da requisição e para verificar se existe um nome igual já cadastrado, caso já tenha ele deve retornar um erro.
+Um middleware fica separado do código em uma pasta chamada **middlewares**, assim temos uma organização melhor do código e com isso uma manutenção mais fácil!.
+
+```js
+// src/middlewares/users.js
+export async function PostUsers(req, res, users) {
+    const user = []
+    for await (const chunk of req){
+        user.push(chunk)
+    }
+    try {
+        req.body = JSON.parse(Buffer.concat(user).toString())
+        users.map((users)=>{
+            if(users.name === req.body.name){
+                req.body = null
+            }
+        })
+    } catch{
+        req.body = null
+    }
+    res.setHeader('content-type','application/json')
+    
+}
+```
+```js
+// src/server.js
+import http from 'node:http';
+import { PostUsers } from './middlewares/users.js';
+
+    const users = [
+        {name: 'Diego', age: 23},
+        {name: 'Cleiton', age: 25},
+        {name: 'Robson', age: 27},
+        {name: 'Daniel', age: 20},
+        ]
+
+    const server = http.createServer(async (request, response) => {
+        const {url, method} = request;
+
+        if(url === '/users' && method === 'GET'){
+            return response.writeHead(200,{'content-type':'application/json'}).end(JSON.stringify(users));
+        }
+        if(url === '/users' && method === 'POST'){
+            await PostUsers(request, response, users)
+            if(request.body != null){
+                users.push(request.body)
+                return response.writeHead(201).end(JSON.stringify(users));
+            }
+            return response.writeHead(400).end('Invalid user')
+        }
+
+        return response.writeHead(404).end();
+    });
+
+    server.listen(5000, () => {
+        console.log('Server is running on port 5000');
+    });
+```
