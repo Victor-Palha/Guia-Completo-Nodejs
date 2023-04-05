@@ -1,0 +1,18 @@
+[{
+    "name": "Joe",
+    "lastname": "Doe",
+    "age": 25,
+    "city": "New York"
+},{
+    "name": "fulano",
+    "lastname": "de tal",
+    "age": 30,
+    "city": "São Paulo"
+},{
+    "name": "ciclano",
+    "lastname": "de tal",
+    "age": 35,
+    "city": "Rio de Janeiro"
+}
+
+]

@@ -177,4 +177,113 @@ OBS: Para usar o comando `import` no Node.js precisamos adicionar o seguinte có
         console.log('Server is running on port 5000');
     });
 ```
+
+### Introdução às Streams no Node.js
+O Node.js é uma plataforma que fornece muitas funcionalidades úteis para lidar com I/O (entrada/saída), incluindo o uso de Streams. Uma Stream é uma sequência de dados que pode ser lida ou escrita em pedaços, em vez de lida ou escrita de uma só vez. O uso de Streams permite que o Node.js processe grandes volumes de dados de maneira eficiente, sem sobrecarregar a memória.
+
+#### Módulos Readable e Writable
+No Node.js, existem dois módulos principais para trabalhar com Streams: Readable e Writable.
+
+O módulo Readable é usado para ler dados de uma fonte, como um arquivo ou uma conexão de rede. Ele fornece vários métodos úteis para ler dados de uma Stream, incluindo:
+
+* read(): lê dados da Stream em um tamanho específico ou até que a Stream seja esvaziada
+* pipe(): encaminha dados de uma Stream para outra Stream, como o módulo Writable
+* push(): adiciona dados à Stream para serem lidos
+O módulo Writable é usado para gravar dados em uma Stream, como um arquivo ou uma conexão de rede. Ele fornece vários métodos úteis para gravar dados em uma Stream, incluindo:
+
+* write(): escreve dados em uma Stream
+* end(): sinaliza o final dos dados na Stream
+
+#### Comandos Pipe e Push
+O método pipe() é um método de conveniência para encadear uma Stream Readable com uma Stream Writable. Ele permite que você leia os dados de uma Stream Readable e os escreva diretamente em uma Stream Writable. Aqui está um exemplo:
+
+```js
+const fs = require('fs');
+const readableStream = fs.createReadStream('file.txt');
+const writableStream = fs.createWriteStream('copy.txt');
+
+readableStream.pipe(writableStream);
 ```
+
+Neste exemplo, estamos criando uma Stream Readable a partir de um arquivo 'file.txt' e uma Stream Writable em um arquivo 'copy.txt'. Em seguida, estamos usando o método pipe() para encadear a Stream Readable na Stream Writable. Isso fará com que os dados do arquivo 'file.txt' sejam lidos e gravados no arquivo 'copy.txt'.
+
+O método push() é usado para adicionar dados a uma Stream Readable para serem lidos. Você pode usar este método em conjunto com o método read() para ler dados em tamanhos específicos. Aqui está um exemplo:
+
+````js
+const { Readable } = require('stream');
+
+const readableStream = new Readable({
+  read(size) {
+    this.push('hello ');
+    this.push('world');
+    this.push(null);
+  }
+});
+
+readableStream.on('data', (chunk) => {
+  console.log(chunk.toString());
+});
+````
+
+Neste exemplo, estamos criando uma Stream Readable personalizada que adiciona os dados "hello " e "world" à Stream usando o método push(). Quando os dados são adicionados à Stream, a função de retorno de chamada read() é chamada e podemos ler os dados usando o método on('data'). No exemplo acima, estamos imprimindo os dados no console. O resultado da execução deste código será a string "hello world".
+
+#### Exemplo Readable Streams
+```js
+    import fs from 'node:fs';
+    import http from 'node:http';
+
+    const server = http.createServer((request, response) => {
+        const {url, method} = request;
+
+        if(url === '/users' && method === 'GET'){
+            const readableStream = fs.createReadStream('./users.json');
+            readableStream.pipe(response);
+        }
+    });
+
+    server.listen(5000, () => {
+        console.log('Server is running on port 5000');
+    });
+```
+Este código é um exemplo de como criar um servidor HTTP em Node.js e usar Streams para enviar um arquivo JSON como resposta para uma solicitação GET.
+
+A primeira linha de código importa o módulo fs do Node.js, que é usado para ler e gravar arquivos. Em seguida, o módulo http também é importado para criar um servidor HTTP.
+
+```javascript
+import fs from 'node:fs';
+import http from 'node:http';
+```
+
+Em seguida, um servidor HTTP é criado usando o método http.createServer(). A função de retorno de chamada do servidor é definida para lidar com solicitações HTTP recebidas pelo servidor.
+
+```javascript
+const server = http.createServer((request, response) => {
+  // Código da função de retorno de chamada do servidor
+});
+```
+A função de retorno de chamada recebe dois parâmetros: request e response. O parâmetro request contém informações sobre a solicitação HTTP recebida pelo servidor, como o URL e o método HTTP. O parâmetro response é usado para enviar uma resposta HTTP ao cliente.
+
+```javascript
+const {url, method} = request;
+```
+A primeira linha do código acima usa a sintaxe de desestruturação do JavaScript para extrair os valores de url e method do objeto request.
+
+O código abaixo verifica se a solicitação recebida é uma solicitação GET para o URL /users. Se for esse o caso, o arquivo users.json será lido usando um Stream Readable e os dados serão enviados como resposta usando o método pipe().
+
+```javascript
+if(url === '/users' && method === 'GET'){
+  const readableStream = fs.createReadStream('./users.json');
+  readableStream.pipe(response);
+}
+```
+
+O método fs.createReadStream() é usado para criar um Stream Readable que lê o arquivo users.json. O método pipe() é então usado para encadear o Stream Readable com o Stream Writable response, que é usado para enviar a resposta HTTP de volta para o cliente.
+
+Por fim, o servidor é iniciado na porta 5000 usando o método server.listen().
+
+```javascript
+server.listen(5000, () => {
+  console.log('Server is running on port 5000');
+});
+```
+Isso fará com que o servidor escute na porta 5000 e exiba a mensagem "Server is running on port 5000" no console. 
