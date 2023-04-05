@@ -177,6 +177,10 @@ OBS: Para usar o comando `import` no Node.js precisamos adicionar o seguinte có
         console.log('Server is running on port 5000');
     });
 ```
+
+## Introdução às Streams no Node.js
+O Node.js é uma plataforma que fornece muitas funcionalidades úteis para lidar com I/O (entrada/saída), incluindo o uso de Streams. Uma Stream é uma sequência de dados que pode ser lida ou escrita em pedaços, em vez de lida ou escrita de uma só vez. O uso de Streams permite que o Node.js processe grandes volumes de dados de maneira eficiente, sem sobrecarregar a memória.
+
 ### Buffers
 1. Buffers são uma sequência de bytes (números) que representam dados;
 2. Exemplo de Buffer:
@@ -186,9 +190,6 @@ OBS: Para usar o comando `import` no Node.js precisamos adicionar o seguinte có
     const buffer = Buffer.from('Hello World');
     console.log(buffer);
 ```
-
-## Introdução às Streams no Node.js
-O Node.js é uma plataforma que fornece muitas funcionalidades úteis para lidar com I/O (entrada/saída), incluindo o uso de Streams. Uma Stream é uma sequência de dados que pode ser lida ou escrita em pedaços, em vez de lida ou escrita de uma só vez. O uso de Streams permite que o Node.js processe grandes volumes de dados de maneira eficiente, sem sobrecarregar a memória.
 
 ### Módulos Readable e Writable
 No Node.js, existem dois módulos principais para trabalhar com Streams: Readable e Writable.
