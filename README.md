@@ -534,4 +534,98 @@ Agora que já temos um middleware para validar os dados, podemos separar as rota
 Primeiro vamos criar um arquivo chamado **routes.js** na pasta **src** e vamos criar um array de objetos com as rotas e seus respectivos métodos.
 ```js
 // src/routes.js
+export const routes = [
+    {
+        path: '/users',
+        method: 'GET',
+        handler: (request, response) => {
+            
+        }
+    },{
+        path: '/users',
+        method: 'POST',
+        handler: (request, response) => {
+            
+        }
+    }
+]
 ```
+O código acima é a base para a criação das rotas, agora vamos popularizar nosso métodos **handler** com as rotas que já temos.
+```js
+import { PostUsers } from "./middlewares/users.js";
+import {Database} from './db.js';
+
+const db = new Database();
+
+export const routes = [
+    {
+        path: '/users',
+        method: 'GET',
+        handler: (request, response) => {
+            const users = JSON.stringify(db.select('users'))
+            return response.writeHead(200,{'content-type':'application/json'}).end(users);
+        }
+    },{
+        path: '/users',
+        method: 'POST',
+        handler: async (request, response) => {
+            await PostUsers(request, response, db)
+            if(request.body != null){
+
+                db.insert('users', request.body);
+
+                return response.writeHead(201).end(JSON.stringify(request.body));
+            }
+
+            return response.writeHead(400).end('Invalid user')
+        }
+    }
+]
+```
+O arquivo ficou um pouco maior, mas não se preocupe, vamos explicar o que está acontecendo aqui.
+1. Primeiro vamos importar o middleware **PostUsers** e o banco de dados **Database**.
+2. Depois vamos criar uma instância do banco de dados.
+3. Depois vamos exportar o array de rotas.
+4. Vamos popularizar o método **handler** da rota **GET**.
+* Primeiro vamos pegar os usuários do banco de dados.
+* Depois vamos converter o array de usuários para uma string.
+* Depois vamos retornar o status **200** e o tipo de conteúdo **application/json**.
+* Depois vamos retornar o array de usuários.
+5. Vamos popularizar o método **handler** da rota **POST**.
+* Primeiro vamos usar o middleware **PostUsers** para validar os dados.
+* Depois vamos verificar se o corpo da requisição não é nulo.
+* Depois vamos inserir os dados no banco de dados.
+* Depois vamos retornar o status **201**.
+* Depois vamos retornar o corpo da requisição.
+6. Caso o corpo da requisição seja nulo, vamos retornar o status **400** e uma mensagem de erro.
+Agora que já temos as rotas separadas, vamos importar o arquivo **routes.js** no arquivo **server.js** e vamos usar o método **find** do array para buscar a rota que foi requisitada.
+```js
+import http from 'node:http';
+import { routes } from './routes.js';
+
+
+    const server = http.createServer(async (request, response) => {
+        
+        const {url, method} = request;
+        //routes
+        const route = routes.find(router =>{
+            return router.path === url && router.method === method;
+        })
+        if(route){
+            return route.handler(request, response)
+        }
+
+        return response.writeHead(404).end();
+    });
+
+    server.listen(5000, () => {
+        console.log('Server is running on port 5000');
+    });
+```
+O código acima é bem simples, vamos explicar o que está acontecendo aqui.
+1. Primeiro vamos importar o array de rotas.
+2. Depois vamos usar o método **find** do array para buscar a rota que foi requisitada.
+3. Depois vamos verificar se a rota existe.
+4. Caso a rota exista, vamos executar o método **handler** da rota.
+5. Caso a rota não exista, vamos retornar o status **404**.
+Pronto, agora nosso projeto já está bem organizado para podermos adicionar novas rotas e novos middlewares de maneira mais fácil e sem poluir um unico arquivo!
