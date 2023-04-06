@@ -1,5 +1,5 @@
 # Estudos Node.js Completo
-![Node imagem](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pngwing.com%2Fen%2Fsearch%3Fq%3Dnode%2Bjs&psig=AOvVaw378wH5cLYc4WLfjCgFlg8w&ust=1680892632923000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCLDempTzlf4CFQAAAAAdAAAAABAE)
+![Node imagem](https://philna.sh/assets/posts/node-1305aa9ecfe75c279ce6772534e04dd5999ddd372dcf28ef41c2a9a84b5acdb1.png.webp)
 
 ## Instalando Node.js
 * Guia de instalação: [Aqui!](https://efficient-sloth-d85.notion.site/Instalando-o-Node-e-o-NPM-d162e2582d5c48499bc6703526912456)
