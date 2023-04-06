@@ -11,12 +11,13 @@ import { Database } from './db.js';
 
         // console.log(users)
         if(url === '/users' && method === 'GET'){
+            console.log(db.database)
             return response.writeHead(200,{'content-type':'application/json'}).end(users);
         }
 
         
         if(url === '/users' && method === 'POST'){
-            await PostUsers(request, response)
+            await PostUsers(request, response, db)
             //console.log(request.body)
             if(request.body != null){
 

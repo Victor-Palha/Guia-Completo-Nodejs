@@ -385,6 +385,148 @@ export class Database{
 Nesse código acima, estamos criando uma classe chamada **Database** e dentro dela temos um método chamado **select** que recebe como parâmetro o nome da tabela e retorna os dados dessa tabela, caso não exista a tabela ele retorna um array vazio.
 E também temos o método **insert** que recebe como parâmetro o nome da tabela e os dados que serão inseridos, caso a tabela não exista ele cria a tabela e insere os dados, caso a tabela já exista ele insere os dados na tabela.
 Agora vamos importar o arquivo **db.js** no arquivo **server.js** e vamos usar o método **select** para retornar os dados da tabela **users**.
+```js
+    import http from 'node:http';
+    import { PostUsers } from './middlewares/users.js';
+    import { Database } from './db.js';
+
+    const db = new Database();
+
+    const server = http.createServer(async (request, response) => {
+        
+        const {url, method} = request;
+        const users = JSON.stringify(db.select('users'))
+
+        // console.log(users)
+        if(url === '/users' && method === 'GET'){
+            return response.writeHead(200,{'content-type':'application/json'}).end(users);
+        }
+
+        
+        if(url === '/users' && method === 'POST'){
+            await PostUsers(request, response, db)
+            if(request.body != null){
+
+                db.insert('users', request.body);
+
+                return response.writeHead(201).end(JSON.stringify(request.body));
+            }
+
+            return response.writeHead(400).end('Invalid user')
+        }
+
+        return response.writeHead(404).end();
+    });
+
+    server.listen(5000, () => {
+        console.log('Server is running on port 5000');
+    });
+```
+Nesse código vamos instanciar a classe **Database** e vamos usar o método **select** para retornar os dados da tabela **users**.
+Agora dentro da rota **GET**, vamos enviar todos os dados que foram inseridos na tabela **users**.
+E dentro da rota **POST**, vamos colocar a instancia do banco de dados como _parâmetro_ do middleware **PostUsers**.
+Agora vamos para a pasta **middlewares** e vamos alterar o arquivo **users.js**.
+```js
+import {randomUUID} from 'crypto'
+
+export async function PostUsers(req, res, db) {
+    
+    const users = db.select('users')
+
+    const user = []
+    for await (const chunk of req){
+        user.push(chunk)
+    }
+
+    try {
+        const newUser = JSON.parse(Buffer.concat(user).toString())
+        newUser.id = randomUUID()
+
+        const existingUser = Array.isArray(users) && users.find(user => user.name === newUser.name);
+
+        if (existingUser) {
+            req.body = null
+        } else {
+            req.body = newUser;
+        }
+        
+    } catch{
+        req.body = null
+    }
+    
+}
+```
+Dentro dos parâmetros do middleware, vamos adicionar o banco de dados como parâmetro e vamos usar o método **select** para retornar os dados da tabela **users**.
+Agora que já temos todos os dados na `const` **users**, vamos fazer uma válidação no nosso _try_.
+Caso já exista um usuário com o mesmo nome registrado, ele vai retornar o `req.body` igual null, caso não exista ele vai retornar o `req.body` com os dados do novo usuário.
+Assim já temos uma configuração de um mini sistema de banco de dados que salva os dados em uma variavel, mas isso não é uma boa prática, pois os dados vão sumir quando o servidor for reiniciado. Então vamos voltar para o arquivo `db.js` e vamos alterar o código para salvar os dados em um arquivo json.
+```js
+import fs from "node:fs/promises"
+
+export class Database{
+    #database = {}
+
+    #persist(){
+        fs.writeFile('db.json', JSON.stringify(this.#database))
+    }
+
+    select(table){
+        return this.#database[table] ?? []
+    }
+    insert(table, data){
+        if(Array.isArray(this.#database[table])){
+            this.#database[table].push(data)
+        }else{
+            this.#database[table] = [data]
+        }
+
+        this.#persist()
+        return data
+    }
+}
+```
+A alteração é bastante simples, vamos importar o modulo `fs` e vamos criar um método privado chamado **persist** que vai salvar os dados no arquivo **db.json**.
+* **OBS: O _`#`_ antes do nome do método é para indicar que o método é privado. Você pode estudar um pouco mais sobre isso em Programação Orientada a Objetos, não iremos abordar isso aqui.**
+O método **persist** vai ser chamado toda vez que uma informação nova for adicionada no banco de dados.
+PRONTO, com poucas linhas de código já temos um sistema de banco de dados que salva os dados em um arquivo json. Mas ainda não acabou, calma ai! Vamos fazer mais algumas alterações para deixar o código mais organizado pois o arquivo **JSON** está sendo salva na raiz do projeto e isso não é uma boa prática, então vamos fazer mais algumas configurações para deixar o código mais organizado e o arquivo não está buscando o JSON já salvo, então vamos resolver esses 2 problemas.
+* Primeiro, crie uma pasta no `src` do seu projeto chamada `data`.
+```js
+import fs from "node:fs/promises"
+
+const databasePath = new URL('./data/db.json', import.meta.url)
+
+export class Database{
+    #database = {}
+
+    constructor(){
+        fs.readFile(databasePath, 'utf8').then(data => this.#database = JSON.parse(data)).catch(()=> this.#persist())
+    }
+
+    #persist(){
+        fs.writeFile(databasePath, JSON.stringify(this.#database))
+    }
+
+    select(table){
+        return this.#database[table] ?? []
+    }
+    insert(table, data){
+        if(Array.isArray(this.#database[table])){
+            this.#database[table].push(data)
+        }else{
+            this.#database[table] = [data]
+        }
+
+        this.#persist()
+        return data
+    }
+}
+```
+Para explicar o que está acontecendo aqui, vamos por partes.
+1. Primeiro vamos criar uma constante chamada **databasePath** que vai receber o caminho do arquivo **db.json** utilizando a classe nativa do Node chamada de `URL` que recebe 2 parametros, sendo eles respectivamente:
+* O prmeiro parametro é o caminho do arquivo que queremos buscar, ele é igual ao comando `cd` do terminal.
+* O caminho do diretório atual do arquivo que está executando.
+2. Criamos uma função construtora para a classe **Database** e dentro dela vamos usar o método **readFile** do modulo **fs** para ler o arquivo **db.json** e vamos usar o método **then** para pegar o resultado da leitura do arquivo e vamos usar o método **catch** para caso o arquivo não exista, ele vai criar um novo arquivo com o nome **db.json**.
+Pronto, agora sim temos um projeto bem legal que aborda os conceitos de rotas, middlewares e banco de dados. Claro que ainda temos muito o que aprender, mas com esse projeto já conseguimos entender um pouco mais sobre esses conceitos fundamentais.
 
 ## Separando Rotas
 Agora que já temos um middleware para validar os dados, podemos separar as rotas em um arquivo separado, assim temos um código mais organizado e com isso uma manutenção mais fácil.
