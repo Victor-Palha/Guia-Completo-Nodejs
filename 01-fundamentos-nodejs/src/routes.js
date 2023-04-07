@@ -9,8 +9,13 @@ export const routes = [
         path: buildRoutePath('/users'),
         method: 'GET',
         handler: (request, response) => {
-            const users = JSON.stringify(db.select('users'))
-            return response.writeHead(200,{'content-type':'application/json'}).end(users);
+            const {search} = request.query;
+            //console.log(search)
+            const users = db.select('users', search ? {
+                name: search,
+                age: search
+            } : false)
+            return response.writeHead(200,{'content-type':'application/json'}).end(JSON.stringify(users));
         }
     },{
         path: buildRoutePath('/users'),
