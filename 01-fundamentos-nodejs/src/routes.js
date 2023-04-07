@@ -1,18 +1,19 @@
 import { PostUsers } from "./middlewares/users.js";
 import {Database} from './db.js';
+import { buildRoutePath } from "./utils/build-route-path.js";
 
 const db = new Database();
 
 export const routes = [
     {
-        path: '/users',
+        path: buildRoutePath('/users'),
         method: 'GET',
         handler: (request, response) => {
             const users = JSON.stringify(db.select('users'))
             return response.writeHead(200,{'content-type':'application/json'}).end(users);
         }
     },{
-        path: '/users',
+        path: buildRoutePath('/users'),
         method: 'POST',
         handler: async (request, response) => {
             await PostUsers(request, response, db)
@@ -24,6 +25,14 @@ export const routes = [
             }
 
             return response.writeHead(400).end('Invalid user')
+        }
+    },{
+        path: buildRoutePath('/users/:id'),
+        method: 'DELETE',
+        handler: (request, response) => {
+            const {id} = request.params;
+            db.delete('users', id)
+            return response.writeHead(204).end();
         }
     }
 ]

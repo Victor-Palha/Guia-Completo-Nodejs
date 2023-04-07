@@ -629,3 +629,183 @@ O código acima é bem simples, vamos explicar o que está acontecendo aqui.
 4. Caso a rota exista, vamos executar o método **handler** da rota.
 5. Caso a rota não exista, vamos retornar o status **404**.
 Pronto, agora nosso projeto já está bem organizado para podermos adicionar novas rotas e novos middlewares de maneira mais fácil e sem poluir um unico arquivo!
+
+## Route, Query Params e Request Body
+Antes de sairmos criando novas rotas, vamos aprender um pouco mais sobre os conceitos de **Route Params**, **Query Params** e **Request Body**.
+### Route Params
+Os **Route Params** são parâmetros que são passados na rota da requisição, por exemplo, se eu quiser pegar um usuário específico, eu vou passar o id do usuário na rota da requisição, exemplo: `http://localhost:5000/users/1`
+1. Casos de uso:
+* Identificar um recurso na alteração ou remoção.
+* Paginação.
+### Query Params
+Os **Query Params** são parâmetros que são passados na rota da requisição, por exemplo, se eu quiser pegar um usuário específico, eu vou passar o id do usuário na rota da requisição, exemplo: `http://localhost:5000/users?id=1`
+1. Casos de uso:
+* Filtros.
+* Paginação.
+### Request Body
+O **Request Body** é o corpo da requisição, ele é utilizado para enviar dados para o servidor, por exemplo, se eu quiser criar um usuário, eu vou passar os dados do usuário no corpo da requisição.
+1. Casos de uso:
+* Criar ou alterar um recurso.
+## Criando novas rotas
+Agora que já sabemos um pouco mais sobre os conceitos de **Route Params**, **Query Params** e **Request Body**, vamos criar novas rotas para o nosso projeto. Começando com uma rota `DELETE` para deletar um usuário.
+* Primeiro vamos ter de ir no nosso arquivo **db.js** para criar um novo método para deletar um usuário.
+
+```js
+{
+    path: '/users/:id',
+    method: 'DELETE',
+    handler: (request, response) => {
+        return response.writeHead(200).end();
+    }
+}
+```
+Com a base da nossa rota criada, precisamos criar um modo para que o nosso servidor acesse o `:id` que é um **route param**. Para isso vamos criar uma nova pasta e nomea-la de **utils**, essa pasta vai ser criada no nosso diretório **src**.
+1. Dentro da pasta **utils** vamos criar um novo arquivo e nomea-lo de **build-route-path.js**.
+2. Dentro do arquivo vamos criar uma **Regex** para procurar dentro na url da requisição o `:id` e substituir por um valor que será passado como parâmetro.
+    * Regex é uma expressão que é usada para procurar e substituir valores dentro de uma string.
+```js
+export function buildRoutePath(path){
+    const routeParameterRegex = /:([a-zA-Z]+)/g
+    const pathWithParams = path.replaceAll(routeParameterRegex, '(?<$1>[a-z0-9\-_]+)')
+
+    const pathRegex = new RegExp(`^${pathWithParams}$`)
+
+    return pathRegex
+}
+```
+Explicando o código acima:
+1. Primeiro vamos criar uma **Regex** para procurar dentro na url da requisição qualquer valor que comece com `:algumaCoisa`.
+2. Depois vamos pegar criar uma váriavel que vai receber a url da requisição e substituir o `:algumaCoisa` por um valor que será uma nova **Regex** que vai procurar qualquer valor que comece com `a-z`, `0-9`, `-` ou `_`.
+3. Depois dessas informações já serem tratadas, vamos criar uma nova **Regex** que comece com as informações que já foram tratadas.
+4. Depois vamos retornar a nova **Regex**.
+
+```js
+import http from 'node:http';
+import { routes } from './routes.js';
+
+
+    const server = http.createServer(async (request, response) => {
+        
+        const {url, method} = request;
+        //routes
+        const route = routes.find(router =>{
+            //Aqui vamos verificar se a url da requisição contem alguma informação da Regex
+            return router.path.test(url) && router.method === method;
+        })
+        if(route){
+            //Aqui vamos pegar o valor do :idDinamico que foi passado na url da requisição
+            const reqParams = url.match(route.path)
+            request.params = {...reqParams.groups}
+            return route.handler(request, response)
+        }
+
+        return response.writeHead(404).end();
+    });
+
+    server.listen(5000, () => {
+        console.log('Server is running on port 5000');
+    });
+```
+* Agora que já temos a nossa **Regex** criada, vamos importar o arquivo **build-route-path.js** no arquivo **server.js** e vamos usar a nossa **Regex** para pegar o valor do `:id` que foi passado na url da requisição.
+* Agora vamos atribuir o nosso valor do `:id` para o nosso objeto **request** utilizando `request.params = {...reqParams.groups}`.
+* Depois de feito isso vamos para o arquivo **routes.js** e vamos atribuir nossa função ao nosso atributo **path**
+```js
+import { PostUsers } from "./middlewares/users.js";
+import {Database} from './db.js';
+import { buildRoutePath } from "./utils/build-route-path.js";
+
+const db = new Database();
+
+export const routes = [
+    {
+        path: buildRoutePath('/users'),
+        method: 'GET',
+        handler: (request, response) => {
+            const users = JSON.stringify(db.select('users'))
+            return response.writeHead(200,{'content-type':'application/json'}).end(users);
+        }
+    },{
+        path: buildRoutePath('/users'),
+        method: 'POST',
+        handler: async (request, response) => {
+            await PostUsers(request, response, db)
+            if(request.body != null){
+
+                db.insert('users', request.body);
+
+                return response.writeHead(201).end(JSON.stringify(request.body));
+            }
+
+            return response.writeHead(400).end('Invalid user')
+        }
+    },{
+        path: buildRoutePath('/users/:id'),
+        method: 'DELETE',
+        handler: (request, response) => {
+            console.log(request.params)
+            return response.writeHead(200).end('Delete user');
+        }
+    }
+]
+```
+Nos vamos importar a nossa função **buildRoutePath** e vamos usar ela para criar uma nova **Regex** para cada rota que tiver um `:id` na url da requisição. Agora podemos acessar o valor do `:id` que foi passado na url da requisição utilizando `request.params`.
+* Agora vamos voltar para o arquivo **db.js** e terminar nosso método para deletar um usuário.
+```js
+import fs from "node:fs/promises"
+
+const databasePath = new URL('./data/db.json', import.meta.url)
+
+export class Database{
+    #database = {}
+
+    constructor(){
+        fs.readFile(databasePath, 'utf8').then(data => this.#database = JSON.parse(data)).catch(()=> this.#persist())
+    }
+
+    #persist(){
+        fs.writeFile(databasePath, JSON.stringify(this.#database))
+    }
+
+    select(table){
+        return this.#database[table] ?? []
+    }
+    insert(table, data){
+        if(Array.isArray(this.#database[table])){
+            this.#database[table].push(data)
+        }else{
+            this.#database[table] = [data]
+        }
+
+        this.#persist()
+        return data
+    }
+    delete(table, id){
+        const data = this.#database[table]
+        
+        const index = data.findIndex(item => item.id === id)
+        if(index > -1){
+            data.splice(index, 1)
+            this.#persist()
+        }
+    }
+}
+```
+Nos já tinhamos criado anteriormente o método para deletar um usuário, agora vamos fazer ele funcionar.
+1. Primeiro vamos pegar o valor do `:id` que foi passado na url da requisição e será usado como parâmetro para o método `delete`.
+2. Depois vamos pegar o valor do `:id` que foi passado na url da requisição e procurar dentro do nosso banco de dados procurando dentro do nosso arquivo _json_ o index desse objeto e validar se ele existe.
+3. Depois vamos deletar o usuário que foi encontrado dentro do nosso banco de dados com a função **split**.
+* Agora vamos finalizar nossa rota utilizando o método **delete**!
+```js
+{
+    path: buildRoutePath('/users/:id'),
+    method: 'DELETE',
+    handler: (request, response) => {
+        const {id} = request.params;
+        db.delete('users', id)
+        return response.writeHead(204).end();
+    }
+}
+```
+Nesse código acima nós vamos pegar o valor do `:id` que foi passado na url da requisição e vamos passar como parâmetro para o nosso método **delete**. 
+* **PRONTO** agora temos nossa rota para deletar um usuário funcionando! e já preparamos o nosso Regex para pegar o valor do `:id` que foi passado na url da requisição, assim poderemos trabalhar mais facilmente com rotas dinâmicas que iremos construir.
+* Eu sei que esse código ficou um pouco grande, mas é para vocês terem uma noção de como funciona uma API REST, e como podemos trabalhar com rotas dinâmicas.
