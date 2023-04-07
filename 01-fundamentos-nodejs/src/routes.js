@@ -34,5 +34,15 @@ export const routes = [
             db.delete('users', id)
             return response.writeHead(204).end();
         }
+    },{
+        path: buildRoutePath('/users/:id'),
+        method: 'PUT',
+        handler: async (request, response) => {
+            await PostUsers(request, response, db)
+            const {id} = request.params;
+            const {name, age} = request.body;
+            db.update('users', id, {name, age})
+            return response.writeHead(204).end();
+        }
     }
 ]

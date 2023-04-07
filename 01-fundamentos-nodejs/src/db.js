@@ -35,4 +35,18 @@ export class Database{
             this.#persist()
         }
     }
+    update(table, id, {name, age}){
+        const data = this.#database[table]
+        
+        const index = data.findIndex(item => item.id === id)
+        if(index > -1){
+            if(name){
+                data[index].name = name
+            }
+            if(age){
+                data[index].age = age
+            }
+            this.#persist()
+        }
+    }
 }

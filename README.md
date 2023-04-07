@@ -809,3 +809,36 @@ Nos já tinhamos criado anteriormente o método para deletar um usuário, agora 
 Nesse código acima nós vamos pegar o valor do `:id` que foi passado na url da requisição e vamos passar como parâmetro para o nosso método **delete**. 
 * **PRONTO** agora temos nossa rota para deletar um usuário funcionando! e já preparamos o nosso Regex para pegar o valor do `:id` que foi passado na url da requisição, assim poderemos trabalhar mais facilmente com rotas dinâmicas que iremos construir.
 * Eu sei que esse código ficou um pouco grande, mas é para vocês terem uma noção de como funciona uma API REST, e como podemos trabalhar com rotas dinâmicas.
+### Criando outras rotas dinâmicas
+Eu vou deixar um pequeno desafio para vocês, vocês vão criar as rotas para atualizar um usuário e para buscar um usuário pelo seu id. Tentem fazer isso com base no que já foi descrito aqui, caso não consigam, vou escrever a solução aqui em baixo.
+* **Solução**
+```js
+//db.js
+update(table, id, {name, age}){
+        const data = this.#database[table]
+        
+        const index = data.findIndex(item => item.id === id)
+        if(index > -1){
+            if(name){
+                data[index].name = name
+            }
+            if(age){
+                data[index].age = age
+            }
+            this.#persist()
+        }
+    }
+```
+```js
+{
+    path: buildRoutePath('/users/:id'),
+    method: 'PUT',
+    handler: async (request, response) => {
+        await PostUsers(request, response, db)
+        const {id} = request.params;
+        const {name, age} = request.body;
+        db.update('users', id, {name, age})
+        return response.writeHead(204).end();
+    }
+}
+```
