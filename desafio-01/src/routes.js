@@ -10,6 +10,7 @@ export const routes = [
         method: 'GET',
         handle: (req, res) => {
             const {search} = req.query;
+            //console.log(search)
             const tasks = database.select('tasks', search ? {
                 title: search,
                 description: search
@@ -36,11 +37,12 @@ export const routes = [
             
             await updateTask(req, res)
             const {id} = req.params
-            const find = database.update('tasks', id, req.body)
-            if(find){
+            
+            if(req.body != null){
+                database.update('tasks', id, req.body)
                 return res.writeHead(204).end();
             }else{
-                return res.writeHead(404).end('Task not found')
+                return res.writeHead(404).end('Invalid content')
             }
 
         }
@@ -60,7 +62,13 @@ export const routes = [
         path: buildRoutePath('/tasks/:id/completed'),
         method: 'PATCH',
         handle: (req, res)=>{
-            
+            const {id} = req.params;
+            const task = database.complete('tasks', id)
+            if(task){
+                return res.writeHead(200,{'content-type':'application/json'}).end("Task completed");
+            }else{
+                return res.writeHead(404).end('Task not found')
+            }
         }
     }
 ]

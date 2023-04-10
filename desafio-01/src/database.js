@@ -17,10 +17,12 @@ export class Database{
     }
 
     select(table, search){
+        //console.log(search)
         let data = this.#datas[table] ?? []
         if(search){
             data = data.filter(row =>{
                 return Object.entries(search).some(([key, value]) => {
+                    value = value.replaceAll("%20", " ")
                     return String(row[key]).toLowerCase().includes(value.toLowerCase())
                 })
             })
@@ -66,6 +68,18 @@ export class Database{
             if(updated.updated_at != undefined){
                 data[index].updated_at = updated.updated_at
             }
+            this.#persist()
+            return true
+        }else{
+            return false
+        }
+    }
+    complete(table, id){
+        const data = this.#datas[table]
+        const index = data.findIndex((item)=> item.id === id)
+        if(index > -1){
+            data[index].updated_at = new Date()
+            data[index].completed_at = new Date()
             this.#persist()
             return true
         }else{

@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { routes } from './routes.js';
+import { extractQueryParams } from './utils/extract-query-params.js';
 
 const server = http.createServer((request, response) => {
     const {method, url} = request

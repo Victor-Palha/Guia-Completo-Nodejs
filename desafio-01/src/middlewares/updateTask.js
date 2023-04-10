@@ -4,8 +4,11 @@ export async function updateTask(req, res){
     for await (const chunk of req){
         newTask.push(chunk)
     }
-    const {title, description} = JSON.parse(Buffer.concat(newTask).toString())
-    if(!title || !description){
+    console.log(newTask.length)
+    const {title, description} = newTask.length !== 0 ? JSON.parse(Buffer.concat(newTask).toString()) : {title: undefined, description: undefined}
+
+    console.log(title, description)
+    if(title === undefined && description === undefined ){
         req.body = null
         return
     }
