@@ -843,3 +843,41 @@ update(table, id, {name, age}){
 }
 ```
 # API Rest com Node.js
+Vamos aprender como construir uma API Rest utilizando o Framework Fastify e utilizando Typescript.
+## Criando projeto
+* Vamos criar um novo projeto utilizando o comando `npm init -y`
+* Agora vamos instalar o Fastify utilizando o comando `npm i fastify`
+* Agora vamos instalar o Typescript utilizando o comando `npm i typescript -D`
+* Agora vamos instalar o @types/node utilizando o comando `npm i @types/node -D`
+* Agora vamos instalar o ts-node utilizando o comando `npm i ts-node-dev -D`
+* Vamos iniciar o Typescript utilizando o comando `npx tsc --init`
+* Vamos ir no arquivo **tsconfig.json** e vamos alterar o valor do atributo **target** para **es2020**
+* Vamos criar uma pasta chamada de `src` e criar um arquivo chamado de **index.ts**
+## Fastify
+* Vamos importar o Fastify e vamos criar uma instância do Fastify.
+```ts
+import fastify from 'fastify';
+
+//Iniciando APP
+const app = fastify();
+
+//Rotas
+app.get('/', async (req, res)=>{
+    return {message: 'Hello World'};
+})
+
+//Iniciando Servidor
+app.listen({port: 5000}).then(()=>{
+    console.log('Servidor rodando na porta 5000');
+})
+```
+* Agora vamos no package.json e vamos criar um script para rodar o nosso servidor.
+```json
+{
+    "scripts": {
+        "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+    }
+}
+```
+* Agora vamos rodar o nosso servidor utilizando o comando `npm run dev`
+* **PRONTO** agora temos nosso servidor rodando na porta 5000.
