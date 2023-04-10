@@ -13,6 +13,7 @@ const server = http.createServer((request, response) => {
         const {query, ...params} = RouteParams.groups
 
         request.params = params
+        
         request.query = query ? extractQueryParams(RouteParams.groups.query) : {}
 
         return route.handle(request, response)

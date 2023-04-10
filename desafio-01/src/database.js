@@ -16,8 +16,15 @@ export class Database{
         fs.writeFile(databasePath, JSON.stringify(this.#datas))
     }
 
-    select(table){
+    select(table, search){
         let data = this.#datas[table] ?? []
+        if(search){
+            data = data.filter(row =>{
+                return Object.entries(search).some(([key, value]) => {
+                    return String(row[key]).toLowerCase().includes(value.toLowerCase())
+                })
+            })
+        }
         return data
     }
 
@@ -37,6 +44,9 @@ export class Database{
         if(index > -1){
             data.splice(index, 1)
             this.#persist()
+            return true
+        }else{
+            return false
         }
     }
 
@@ -57,6 +67,9 @@ export class Database{
                 data[index].updated_at = updated.updated_at
             }
             this.#persist()
+            return true
+        }else{
+            return false
         }
     }
 }

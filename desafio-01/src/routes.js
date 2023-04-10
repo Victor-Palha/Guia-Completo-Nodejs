@@ -33,21 +33,28 @@ export const routes = [
         path: buildRoutePath('/tasks/:id'),
         method: 'PUT',
         handle: async (req, res)=>{
-            await updateTask(req, res, database)
+            
+            await updateTask(req, res)
             const {id} = req.params
-            const updated = req.body
-            console.log(updated)
-            database.update('tasks', id, updated)
-            return res.writeHead(201).end();
+            const find = database.update('tasks', id, req.body)
+            if(find){
+                return res.writeHead(204).end();
+            }else{
+                return res.writeHead(404).end('Task not found')
+            }
+
         }
     },{
         path: buildRoutePath('/tasks/:id'),
         method: 'DELETE',
         handle: async (req, res)=>{
-            await ValidTask(req, res, database)
             const {id} = req.params;
-            database.delete('tasks', id)
-            return res.writeHead(204).end();
+            const find = database.delete('tasks', id)
+            if(find){
+                return res.writeHead(204).end();
+            }else{
+                return res.writeHead(404).end('Task not found')
+            }
         }
     },{
         path: buildRoutePath('/tasks/:id/completed'),
