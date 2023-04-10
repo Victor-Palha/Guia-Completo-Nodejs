@@ -881,3 +881,24 @@ app.listen({port: 5000}).then(()=>{
 ```
 * Agora vamos rodar o nosso servidor utilizando o comando `npm run dev`
 * **PRONTO** agora temos nosso servidor rodando na porta 5000.
+## Eslint
+O que é o Eslint?
+* O Eslint é uma ferramenta que nos permite padronizar o nosso código, assim evitando erros e deixando o nosso código mais limpo.
+* Vamos instalar o eslint utilizando o comando: `npm i eslint @rocketseat/eslint-config -D`
+* Agora vamos criar um arquivo chamado de **.eslintrc.json** na raiz do projeto e vamos adicionar o seguinte código.
+```json
+{
+    "extends":[
+        "@rocketseat/eslint-config/node"
+    ]
+}
+```
+* No visual studio code vamos instalar a extensão do **eslint**.
+* Agora vamos no _package.json_ e vamos criar um código para automatizar a correção do código.
+```json
+{
+    "scripts": {
+        "lint": "eslint --ext .ts src --fix"
+    }
+}
+```
