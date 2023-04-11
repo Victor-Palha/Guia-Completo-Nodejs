@@ -902,3 +902,45 @@ O que é o Eslint?
     }
 }
 ```
+## Banco de Dados
+### Instanciação
+* Nessa parte vamos utilizar um banco de dados para nossa API, o banco de dados que vamos utilizar é o **SQLite**.
+* Para podermos abstrair o banco de dados vamos utilizar o **knex**. O Knex é um query builder que nos permite trabalhar com diversos bancos de dados.
+* Vamos instalar o knex e o driver do sqlite utilizando o comando:
+```bash
+    npm i knex sqlite3
+```
+Vamos configurar o knex para utilizar o sqlite.
+* Dentro do projeto que criamos anteriormente, vamos ir em _src_ e vamos criar um arquivo chamado de **database.ts**
+* Nessa arquivo vamos criar uma instância do knex e vamos configurar o knex para utilizar o sqlite.
+```js
+import { knex as setupKnex, Knex } from 'knex'
+//  Config
+export const config: Knex.Config = {
+    //  nome do banco de dados
+    client: 'sqlite',
+    //  tipo de conexão
+    connection: {
+        //  caminho do arquivo
+        filename: './db/app.db',
+    },
+    //  configurações do banco de dados
+    useNullAsDefault: true,
+    migrations: {
+        extension: 'ts',
+        directory: './db/migrations',
+    },
+}
+// Exportando conexão
+export const knex = setupKnex(config)
+
+```
+* Agora vamos criar um arquivo na raiz do projeto chamada de **knexfile.ts** e vamos adicionar o seguinte código.
+```js
+import { config } from './src/database'
+
+export default config
+
+```
+* Criamos a instancia do SQLite e configuramos o knex para utilizar o SQLite, os dados vão ser salvos em uma pasta chamada _db_ que criaremos na raiz do projeto.
+* Agora vamos criar nossa primeira migration utilizando o comando `npx knex migrate:make create_documents`
