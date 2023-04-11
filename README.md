@@ -944,3 +944,45 @@ export default config
 ```
 * Criamos a instancia do SQLite e configuramos o knex para utilizar o SQLite, os dados vão ser salvos em uma pasta chamada _db_ que criaremos na raiz do projeto.
 * Agora vamos criar nossa primeira migration utilizando o comando `npx knex migrate:make create_documents`
+### Migrations
+Com o comando anterior criamos uma migration, agora vamos criar a tabela de documentos.
+* Vamos abrir o arquivo que foi criado na pasta _db/migrations_ e vamos adicionar o seguinte código.
+```js
+import { Knex } from 'knex'
+
+export async function up(knex: Knex): Promise<void> {
+    await knex.schema.createTable('transactions', (table) => {
+        table.uuid('id').primary()
+        table.text('title').notNullable()
+        table.decimal('amount', 10, 2).notNullable()
+        table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
+    })
+}
+
+export async function down(knex: Knex): Promise<void> {
+    await knex.schema.dropTable('transactions')
+}
+
+```
+O método **up** é responsável por criar a tabela e o método **down** é responsável por deletar a tabela.
+* Estamos criando uma tabela chamada de **transactions** e estamos criando uma coluna chamada de **id** que é do tipo **uuid** e é a chave primária da tabela, estamos criando uma coluna chamada de **title** que é do tipo **text** e não pode ser nulo.
+* Agora vamos rodar a migration utilizando o comando `npx knex migrate:latest`
+* Caso queira desfazer a migration podemos utilizar o comando `npx knex migrate:rollback`
+* Vamos criar uma outra migrate para alterar a tabela **transactions**.
+    * Vamos criar uma migrate utilizando o comando `npx knex migrate:make add-session-id-to-transactions`
+    * Com essa migrate vamos adicionar uma coluna chamada de **session_id** na tabela **transactions**.
+    ```js
+    import { Knex } from 'knex'
+    export async function up(knex: Knex): Promise<void> {
+        await knex.schema.alterTable('transactions', (table) => {
+            table.uuid('session_id').after('id').index()
+        })
+    }
+
+    export async function down(knex: Knex): Promise<void> {
+        await knex.schema.alterTable('transactions', (table) => {
+            table.dropColumn('session_id')
+        })
+    }
+    ```
+    * Agora vamos rodar a migrate utilizando o comando `npx knex migrate:latest`
