@@ -1033,9 +1033,9 @@ O que são variáveis de ambiente? Variáveis de ambiente são variáveis que s�
 * Vamos instalar a biblioteca utilizando o comando `npm i dotenv`.
 * Agora vamos criar um arquivo chamado de **.env** na raiz do projeto e vamos adicionar as seguintes variáveis de ambiente.
 ```env
-    DB_CLIENT=sqlite
+    NODE_ENV="development"
+    DB_CLIENT="sqlite"
     DB_FILENAME=./db/app.db
-    PORT=5000
 ```
 * Agora vamos importar o dotenv no arquivo **index.ts** dentro de uma pasta chamada de **env** em **src** e vamos utilizar o método **config** para carregar as variáveis de ambiente.
 * Agora vamos importar uma biblioteca chamada de **zod** que é uma biblioteca para validação de dados.
@@ -1046,12 +1046,22 @@ import 'dotenv/config'
 import { z } from 'zod'
 
 const envSchema = z.object({
+    NODE_ENV: z
+        .enum(['development', 'production', 'test'])
+        .default('development'),
     DATABASE_CLIENT: z.string(),
     DATABASE_URL: z.string(),
     PORT: z.number().default(5000),
 })
 
-export const env = envSchema.parse(process.env)
+export const _env = envSchema.safeParse(process.env)
+
+if (_env.success === false) {
+    throw new Error('Invalid env')
+}
+
+export const env = _env.data
+
 ```
 Com esse código estamos importando o dotenv e estamos importando a biblioteca zod, estamos criando um schema para validar as variáveis de ambiente e estamos exportando as variáveis de ambiente, para utilizar as variáveis de ambiente estamos utilizando a biblioteca `dotenv` e **process.env.NOME_DA_VARIAVEL**.
 * Agora vamos importar a váriavel **env** dentro do **server.ts** e do **database.ts**, com isso vamos poder pegar a porta e o banco de dados que estão definidas nas variáveis de ambiente e já foram tratadas pelo Zod.

@@ -3,11 +3,11 @@ import { env } from './env'
 //  Config
 export const config: Knex.Config = {
     //  nome do banco de dados
-    client: env.DATABASE_URL as string,
+    client: env.DATABASE_CLIENT,
     //  tipo de conexão
     connection: {
         //  caminho do arquivo
-        filename: env.DATABASE_URL as string,
+        filename: env.DATABASE_URL,
     },
     //  configurações do banco de dados
     useNullAsDefault: true,
