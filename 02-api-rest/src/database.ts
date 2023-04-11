@@ -1,12 +1,13 @@
+import 'dotenv/config'
 import { knex as setupKnex, Knex } from 'knex'
 //  Config
 export const config: Knex.Config = {
     //  nome do banco de dados
-    client: 'sqlite',
+    client: process.env.DATABASE_URL as string,
     //  tipo de conexão
     connection: {
         //  caminho do arquivo
-        filename: './db/app.sql',
+        filename: process.env.DATABASE_URL as string,
     },
     //  configurações do banco de dados
     useNullAsDefault: true,

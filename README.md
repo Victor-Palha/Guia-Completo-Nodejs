@@ -1027,3 +1027,36 @@ app.listen({ port: 5000 }).then(() => {
 
 ```
 Podemos testar essas rotas com `http://localhost:5000/insert` e `http://localhost:5000/select`. Agora já sabemos como configurar o nosso banco de dados na nossa aplicação, criar migrates e utilizar o knex na nossas rotas.
+### Variáveis de ambiente
+O que são variáveis de ambiente? Variáveis de ambiente são variáveis que são definidas no sistema operacional e que podem ser acessadas pelo nosso código.
+* Para utilizar variáveis de ambiente no nosso projeto vamos utilizar a biblioteca **dotenv**.
+* Vamos instalar a biblioteca utilizando o comando `npm i dotenv`.
+* Agora vamos criar um arquivo chamado de **.env** na raiz do projeto e vamos adicionar as seguintes variáveis de ambiente.
+```env
+    DB_CLIENT=sqlite
+    DB_FILENAME=./db/app.db
+```
+* Agora vamos importar o dotenv no arquivo **database.ts** e vamos utilizar o método **config** para carregar as variáveis de ambiente.
+```js
+import 'dotenv/config'
+import { knex as setupKnex, Knex } from 'knex'
+//  Config
+export const config: Knex.Config = {
+    //  nome do banco de dados
+    client: process.env.DATABASE_URL as string,
+    //  tipo de conexão
+    connection: {
+        //  caminho do arquivo
+        filename: process.env.DATABASE_URL as string,
+    },
+    //  configurações do banco de dados
+    useNullAsDefault: true,
+    migrations: {
+        extension: 'ts',
+        directory: './db/migrations',
+    },
+}
+// Exportando conexão
+export const knex = setupKnex(config)
+```
+Note que agora estamos utilizando as variáveis de ambiente para definir o nome do banco de dados e o caminho do arquivo utilizando o método **process.env.NOME_DA_VARIAVEL**.

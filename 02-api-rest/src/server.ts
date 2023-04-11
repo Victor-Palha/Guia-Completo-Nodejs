@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import fastify from 'fastify'
 import { knex } from './database'
 import crypto from 'node:crypto'
