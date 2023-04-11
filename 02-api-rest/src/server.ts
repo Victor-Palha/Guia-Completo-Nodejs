@@ -1,7 +1,7 @@
-import 'dotenv/config'
 import fastify from 'fastify'
 import { knex } from './database'
 import crypto from 'node:crypto'
+import { env } from './env'
 
 // Iniciando APP
 const app = fastify()
@@ -29,6 +29,6 @@ app.get('/select', async (req, res) => {
 })
 
 // Iniciando Servidor
-app.listen({ port: 5000 }).then(() => {
+app.listen({ port: env.PORT }).then(() => {
     console.log('Servidor rodando na porta 5000')
 })

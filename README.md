@@ -1035,19 +1035,76 @@ O que são variáveis de ambiente? Variáveis de ambiente são variáveis que s�
 ```env
     DB_CLIENT=sqlite
     DB_FILENAME=./db/app.db
+    PORT=5000
 ```
-* Agora vamos importar o dotenv no arquivo **database.ts** e vamos utilizar o método **config** para carregar as variáveis de ambiente.
+* Agora vamos importar o dotenv no arquivo **index.ts** dentro de uma pasta chamada de **env** em **src** e vamos utilizar o método **config** para carregar as variáveis de ambiente.
+* Agora vamos importar uma biblioteca chamada de **zod** que é uma biblioteca para validação de dados.
+* Vamos instalar a biblioteca utilizando o comando `npm i zod`.
 ```js
+//src/env/index.ts
 import 'dotenv/config'
+import { z } from 'zod'
+
+const envSchema = z.object({
+    DATABASE_CLIENT: z.string(),
+    DATABASE_URL: z.string(),
+    PORT: z.number().default(5000),
+})
+
+export const env = envSchema.parse(process.env)
+```
+Com esse código estamos importando o dotenv e estamos importando a biblioteca zod, estamos criando um schema para validar as variáveis de ambiente e estamos exportando as variáveis de ambiente, para utilizar as variáveis de ambiente estamos utilizando a biblioteca `dotenv` e **process.env.NOME_DA_VARIAVEL**.
+* Agora vamos importar a váriavel **env** dentro do **server.ts** e do **database.ts**, com isso vamos poder pegar a porta e o banco de dados que estão definidas nas variáveis de ambiente e já foram tratadas pelo Zod.
+```js
+//server.ts
+import fastify from 'fastify'
+import { knex } from './database'
+import crypto from 'node:crypto'
+import { env } from './env' //Importanto variáveis de ambiente
+
+// Iniciando APP
+const app = fastify()
+
+// Rotas
+app.get('/', async (req, res) => {
+    return { message: 'Hello World' }
+})
+
+app.get('/insert', async (req, res) => {
+    const transactions = await knex('transactions')
+        .insert({
+            id: crypto.randomUUID(),
+            title: 'Teste',
+            amount: 1000,
+        })
+        .returning('*')
+
+    return transactions
+})
+
+app.get('/select', async (req, res) => {
+    const transactions = await knex('transactions').select('*')
+    return transactions
+})
+
+// Iniciando Servidor
+app.listen({ port: env.PORT }).then(() => { //Utilizando na PORTA do servidor
+    console.log('Servidor rodando na porta 5000')
+})
+
+```
+```js
+//database.ts
 import { knex as setupKnex, Knex } from 'knex'
+import { env } from './env'
 //  Config
 export const config: Knex.Config = {
     //  nome do banco de dados
-    client: process.env.DATABASE_URL as string,
+    client: env.DATABASE_URL as string,
     //  tipo de conexão
     connection: {
         //  caminho do arquivo
-        filename: process.env.DATABASE_URL as string,
+        filename: env.DATABASE_URL as string,
     },
     //  configurações do banco de dados
     useNullAsDefault: true,
@@ -1058,5 +1115,5 @@ export const config: Knex.Config = {
 }
 // Exportando conexão
 export const knex = setupKnex(config)
+
 ```
-Note que agora estamos utilizando as variáveis de ambiente para definir o nome do banco de dados e o caminho do arquivo utilizando o método **process.env.NOME_DA_VARIAVEL**.
