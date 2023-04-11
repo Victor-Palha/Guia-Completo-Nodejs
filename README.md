@@ -986,3 +986,44 @@ O método **up** é responsável por criar a tabela e o método **down** é resp
     }
     ```
     * Agora vamos rodar a migrate utilizando o comando `npx knex migrate:latest`
+### Testando a conexão com o banco de dados
+Vamos ir para nosso arquivo **server.ts** e vamos importar o knex e vamos criar duas rotas para testar a conexão com o banco de dados.
+1. A primeira rota vai ser `/insert` onde vamos inserir dados fictícios na tabela **transactions**.
+2. A segunda rota vai ser `/select` onde vamos selecionar os dados da tabela **transactions**.
+```js
+import fastify from 'fastify'
+import { knex } from './database'
+import crypto from 'node:crypto'
+
+// Iniciando APP
+const app = fastify()
+
+// Rotas
+app.get('/', async (req, res) => {
+    return { message: 'Hello World' }
+})
+
+app.get('/insert', async (req, res) => {
+    const transactions = await knex('transactions')
+        .insert({
+            id: crypto.randomUUID(),
+            title: 'Teste',
+            amount: 1000,
+        })
+        .returning('*')
+
+    return transactions
+})
+
+app.get('/select', async (req, res) => {
+    const transactions = await knex('transactions').select('*')
+    return transactions
+})
+
+// Iniciando Servidor
+app.listen({ port: 5000 }).then(() => {
+    console.log('Servidor rodando na porta 5000')
+})
+
+```
+Podemos testar essas rotas com `http://localhost:5000/insert` e `http://localhost:5000/select`. Agora já sabemos como configurar o nosso banco de dados na nossa aplicação, criar migrates e utilizar o knex na nossas rotas.

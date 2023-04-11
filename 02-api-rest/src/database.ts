@@ -6,7 +6,7 @@ export const config: Knex.Config = {
     //  tipo de conexão
     connection: {
         //  caminho do arquivo
-        filename: './db/app.db',
+        filename: './db/app.sql',
     },
     //  configurações do banco de dados
     useNullAsDefault: true,
