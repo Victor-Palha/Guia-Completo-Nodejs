@@ -1138,7 +1138,7 @@ import { knex } from '../database'
 import { FastifyInstance } from 'fastify'
 
 export async function transactions(app: FastifyInstance) {
-    app.get('/select', async (req, res) => {
+    app.get('/', async (req, res) => {
         const transactions = await knex('transactions').select('*')
         return transactions
     })
@@ -1158,10 +1158,8 @@ import { transactions } from './routes/transactions'
 const app = fastify()
 
 // Rotas
-app.register(transactions)
-
-app.get('/', async (req, res) => {
-    return { message: 'Hello World' }
+app.register(transactions, {
+    prefix: '/transactions',
 })
 
 app.get('/insert', async (req, res) => {
@@ -1181,5 +1179,38 @@ app.listen({ port: env.PORT }).then(() => {
     console.log('Servidor rodando na porta 5000')
 })
 ```
-Note que usamos o método **register** para registrar as rotas e dentro dela colocamos a função que criamos, com isso o fastify vai registrar as rotas e já vai disponibilizar para utilizarmos.
+Note que usamos o método **register** para registrar as rotas e dentro dela colocamos a função que criamos, com isso o fastify vai registrar as rotas e já vai disponibilizar para utilizarmos, note que passamos um objeto junto do plugin, esse objeto é visto para configuração das rotas daquela função, definimos que todas as rotas dentro de `transactions` começa com o prefixo '/transactions'.
 * Agora você pode testar a rota **/select** utilizando o Insomnia, Postman, Thunderclient, Httpie ou etc...
+### Criando a rota de inserção
+Agora que aprendemos como criar um plugin, vamos deletar aquelas rotas que criamos anteriormente e vamos criar uma rota de inserção, vamos criar uma rota que recebe um objeto com o título, valor e tipo da transação e insere no banco de dados.
+```ts
+import { knex } from '../database'
+import { z } from 'zod'
+import { FastifyInstance } from 'fastify'
+import crypto from 'node:crypto'
+
+export async function transactionsRoutes(app: FastifyInstance) {
+    app.post('/', async (req, res) => {
+        const createTransactionSchema = z.object({
+            title: z.string(),
+            amount: z.number(),
+            type: z.enum(['credit', 'debit']),
+        })
+
+        const { title, amount, type } = createTransactionSchema.parse(req.body)
+
+        await knex('transactions').insert({
+            id: crypto.randomUUID(),
+            title,
+            amount: type === 'credit' ? amount : amount * -1,
+        })
+
+        return res.status(201).send({ message: 'Transaction created' })
+    })
+}
+```
+Nesse código estamos criando uma rota **POST**, primeiramente vamos importar o `zod` para validar os dados que estamos recebendo.
+* Depois de criar um Schema do Zod vamos utilizar o `req.body` para pegar as informações e validar com o Schema, caso o Schema não seja válido o fastify vai retornar um erro.
+* Após isso vamos apenas utilizar o Knex para inserir os dados no banco de dados com as informações já validadas.
+* Se tudo der certo vamos enviar um status 201 e uma mensagem de sucesso.
+    * Teste a rota `http://localhost:5000/transactions` passando no `req.body` as informações de uma transação.
