@@ -1214,3 +1214,25 @@ Nesse código estamos criando uma rota **POST**, primeiramente vamos importar o 
 * Após isso vamos apenas utilizar o Knex para inserir os dados no banco de dados com as informações já validadas.
 * Se tudo der certo vamos enviar um status 201 e uma mensagem de sucesso.
     * Teste a rota `http://localhost:5000/transactions` passando no `req.body` as informações de uma transação.
+
+### Tipagem do Knex
+Podemos alterar a tipagem do Typescript para o Knex, com isso vamos definir de quais tipos são nossas tabelas e colunas, para isso vamos criar uma pasta e um arquivo chamado de **knex.d.ts** na pasta **@types** na raiz do projeto e vamos adicionar o seguinte código:
+```ts
+//  eslint-disable-next-line
+import { Knex } from 'knex'
+
+type Transactions = {
+    id: string
+    title: string
+    amount: number
+    created_at: string
+    session_id?: string
+}
+declare module 'knex/types/tables' {
+    export interface Tables {
+        transactions: Transactions
+    }
+}
+```
+Agora temos a tipagem correta para o nosso banco de dados, com isso podemos utilizar o Knex de forma correta e com tipagem.
+### Listando Transações
