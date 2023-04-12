@@ -1236,3 +1236,30 @@ declare module 'knex/types/tables' {
 ```
 Agora temos a tipagem correta para o nosso banco de dados, com isso podemos utilizar o Knex de forma correta e com tipagem.
 ### Listando Transações
+Vamos utilizar nosso plugin para criar 2 rotas nesse modulo, a primeira rota vai ser para buscar todas as informações do banco de dados e a segunda rota vai ser para buscar as informações de uma transação específica.
+* Primeiro vamos criar a rota de listagem de todas as transações.
+```ts
+    app.get('/', async (req, res) => {
+        const transactions = await knex('transactions').select()
+
+        return res.status(200).send({ transactions })
+    })
+```
+É uma rota bastante simples que busca todas as informações do banco de dados e retorna para o usuário na forma de um objeto, a esse ponto você já deve estar acostumado com o código.
+* Agora vamos criar a rota de listagem de uma transação específica buscando pelo **id**
+* Você vai perceber que utilizando o Fastify é  **BEM** mais simples que utilizando apenas o módulo **HTTP** do Nodejs, pois toda a parte de validação do **Request Query** e **Request Params** já estão abstraidas para nós utilizarmos!
+```ts
+    app.get('/:id', async (req, res) => {
+        const getTransactionSchema = z.object({
+            id: z.string().uuid(),
+        })
+        const { id } = getTransactionSchema.parse(req.params)
+
+        const transactions = await knex('transactions').where('id', id).first()
+
+        return res.status(200).send({ transactions })
+    })
+```
+* Nessa rota estamos validando com o Zod o **id** que está vindo na rota, caso o **id** não seja um **uuid** válido o fastify vai retornar um erro.
+* Após isso vamos buscar no banco de dados a transação com o **id** que foi passado na rota utilizando o método `where` e depois passando o método `first`.
+* Depois apenas retornamos como um objeto para o usuário
