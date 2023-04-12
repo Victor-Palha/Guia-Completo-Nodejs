@@ -2,11 +2,14 @@ import fastify from 'fastify'
 import { knex } from './database'
 import crypto from 'node:crypto'
 import { env } from './env'
+import { transactions } from './routes/transactions'
 
 // Iniciando APP
 const app = fastify()
 
 // Rotas
+app.register(transactions)
+
 app.get('/', async (req, res) => {
     return { message: 'Hello World' }
 })
@@ -20,11 +23,6 @@ app.get('/insert', async (req, res) => {
         })
         .returning('*')
 
-    return transactions
-})
-
-app.get('/select', async (req, res) => {
-    const transactions = await knex('transactions').select('*')
     return transactions
 })
 

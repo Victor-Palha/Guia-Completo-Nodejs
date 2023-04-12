@@ -1127,3 +1127,59 @@ export const config: Knex.Config = {
 export const knex = setupKnex(config)
 
 ```
+## Implementando Rotas
+Vamos utilizar o fastify para criar as rotas da nossa aplicação e para isso vamos utilizar o plugin do fastify.
+* O que são plugins? Plugins são funções que adicionam funcionalidades ao fastify.
+### Plugins
+Vamos criar uma nova pasta em _src_ chamada de _routes_ e vamos criar um arquivo chamado de _transactionss_. Dentro dessa arquivo vamos criar uma função que vai receber o fastify como parâmetro e com isso vamos criar as rotas, como base vamos utilizar a rota de **select** que criamos anteriormente.
+```ts
+//src/routes/transactions.ts
+import { knex } from '../database'
+import { FastifyInstance } from 'fastify'
+
+export async function transactions(app: FastifyInstance) {
+    app.get('/select', async (req, res) => {
+        const transactions = await knex('transactions').select('*')
+        return transactions
+    })
+}
+
+```
+Aqui estamos criando uma função **assincrona** que é obrigatória pelo Fastify, essa função recebe como parâmetro o fastify e com base no parametro criamos nossas rotas!
+* Agora vamos importar essa função dentro do arquivo **server.ts** e vamos chamar a função passando o fastify como parâmetro.
+```ts
+import fastify from 'fastify'
+import { knex } from './database'
+import crypto from 'node:crypto'
+import { env } from './env'
+import { transactions } from './routes/transactions'
+
+// Iniciando APP
+const app = fastify()
+
+// Rotas
+app.register(transactions)
+
+app.get('/', async (req, res) => {
+    return { message: 'Hello World' }
+})
+
+app.get('/insert', async (req, res) => {
+    const transactions = await knex('transactions')
+        .insert({
+            id: crypto.randomUUID(),
+            title: 'Teste',
+            amount: 1000,
+        })
+        .returning('*')
+
+    return transactions
+})
+
+// Iniciando Servidor
+app.listen({ port: env.PORT }).then(() => {
+    console.log('Servidor rodando na porta 5000')
+})
+```
+Note que usamos o método **register** para registrar as rotas e dentro dela colocamos a função que criamos, com isso o fastify vai registrar as rotas e já vai disponibilizar para utilizarmos.
+* Agora você pode testar a rota **/select** utilizando o Insomnia, Postman, Thunderclient, Httpie ou etc...
