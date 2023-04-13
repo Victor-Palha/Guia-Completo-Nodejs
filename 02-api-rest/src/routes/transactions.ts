@@ -2,6 +2,7 @@ import { knex } from '../database'
 import { z } from 'zod'
 import { FastifyInstance } from 'fastify'
 import crypto from 'node:crypto'
+import { validCookie } from '../middlewares/validCookies'
 
 export async function transactionsRoutes(app: FastifyInstance) {
     app.post('/', async (req, res) => {
@@ -18,9 +19,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
         if (!sessionId) {
             sessionId = crypto.randomUUID()
 
-            res.cookie('sessionId', sessionId, {
+            res.cookie('session_id', sessionId, {
                 path: '/',
                 maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+                secure: false,
             })
         }
 
@@ -34,26 +36,35 @@ export async function transactionsRoutes(app: FastifyInstance) {
         return res.status(201).send({ message: 'Transaction created' })
     })
 
-    app.get('/', async (req, res) => {
-        const transactions = await knex('transactions').select()
+    app.get('/', { preHandler: [validCookie] }, async (req, res) => {
+        const sessionId = req.cookies.session_id
+
+        const transactions = await knex('transactions').where(
+            'session_id',
+            sessionId,
+        )
 
         return res.status(200).send({ transactions })
     })
 
-    app.get('/:id', async (req, res) => {
+    app.get('/:id', { preHandler: [validCookie] }, async (req, res) => {
         const getTransactionSchema = z.object({
             id: z.string().uuid(),
         })
+        const sessionId = req.cookies.session_id
         const { id } = getTransactionSchema.parse(req.params)
-        console.log(id)
 
-        const transactions = await knex('transactions').where('id', id).first()
+        const transactions = await knex('transactions')
+            .where({ session_id: sessionId, id })
+            .first()
 
         return res.status(200).send({ transactions })
     })
 
-    app.get('/summary', async (req, res) => {
+    app.get('/summary', { preHandler: [validCookie] }, async (req, res) => {
+        const sessionId = req.cookies.session_id
         const summary = await knex('transactions')
+            .where({ session_id: sessionId })
             .sum('amount', { as: 'amount' })
             .first()
 

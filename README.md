@@ -1350,3 +1350,116 @@ if (!sessionId) {
 ```
 Note que assim que criamos um cookie **CASO** o usuário não tenha, estamos passando um **path** e um **maxAge** para o cookie, o **path** é o caminho que o cookie vai ser utilizado, no nosso caso é o **/** que é a raiz do nosso site, e o **maxAge** é o tempo que o cookie vai ficar armazenado no navegador do usuário, no nosso caso é de 30 dias. Depois enviamos pelo **Response** o cookie para o usuário.
 * Agora podemos trabalhar sabendo que o usuário tem um cookie e isso facilitará na hora da listagem do resumo da conta.
+### Validando existência de cookie
+Para começarmos a validar a existência de um cookie, vamos criar um middleware para validar se o usuário tem um cookie válido.
+1. Vamos criar um arquivo chamado **validCookie.ts** na pasta **middlewares** no **src*.
+2. Dentro desse arquivo vamos importar as tipagens do Fastify para Request e Response.
+3. Depois vamos criar uma função que vai receber o **Request** e o **Response** e vai puxar o `cookie` do **Request**.
+4. Vamos verificar se o cookie existe, caso não exista vamos retornar um erro para o usuário.
+```ts
+import { FastifyRequest, FastifyReply } from 'fastify'
+
+export async function validCookie(req: FastifyRequest, res: FastifyReply) {
+    const sessionId = req.cookies.session_id
+
+    if (!sessionId) {
+        return res.status(401).send({ error: 'Unauthorized' })
+    }
+}
+```
+Pronto, agora temos um middleware para validação de cookie. Agora vamos importar esse middleware para nossas rotas.
+#### Importando middleware para as rotas
+Primeiramente vamos importar nossa função **validCookie** no nosso arquivo **transactions.ts**.
+* Depois de importado vamos simplesmente usar a sintaxe do Fastify para chamar o middleware antes que a rota seja realizada.
+* Para chamar um middleware no Fastify vamos chamar ela entre a **URL** e a rota em si.
+```ts
+app.get('/', { preHandler: [validCookie] }, async (req, res) => {
+        const sessionId = req.cookies.session_id
+
+        const transactions = await knex('transactions').where(
+            'session_id',
+            sessionId,
+        )
+
+        return res.status(200).send({ transactions })
+    })
+```
+Note que em um objeto com o atributo `preHandler` recebe um array com nosso middleware, isso porquê podemos colocar mais de um função middleware em uma unica rota.
+* Agora que já estamos validando que o cookie existe, vamos pegar o cookie do nosso **Request** e usar o Knex para colocar na nossa Query.
+* O código completa fica dessa forma:
+```ts
+import { knex } from '../database'
+import { z } from 'zod'
+import { FastifyInstance } from 'fastify'
+import crypto from 'node:crypto'
+import { validCookie } from '../middlewares/validCookies'
+
+export async function transactionsRoutes(app: FastifyInstance) {
+    app.post('/', async (req, res) => {
+        const createTransactionSchema = z.object({
+            title: z.string(),
+            amount: z.number(),
+            type: z.enum(['credit', 'debit']),
+        })
+
+        const { title, amount, type } = createTransactionSchema.parse(req.body)
+        // session_id is a cookie
+        let sessionId = req.cookies.session_id
+
+        if (!sessionId) {
+            sessionId = crypto.randomUUID()
+
+            res.cookie('session_id', sessionId, {
+                path: '/',
+                maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+                secure: false,
+            })
+        }
+
+        await knex('transactions').insert({
+            id: crypto.randomUUID(),
+            title,
+            amount: type === 'credit' ? amount : amount * -1,
+            session_id: sessionId,
+        })
+
+        return res.status(201).send({ message: 'Transaction created' })
+    })
+
+    app.get('/', { preHandler: [validCookie] }, async (req, res) => {
+        const sessionId = req.cookies.session_id
+
+        const transactions = await knex('transactions').where(
+            'session_id',
+            sessionId,
+        )
+
+        return res.status(200).send({ transactions })
+    })
+
+    app.get('/:id', { preHandler: [validCookie] }, async (req, res) => {
+        const getTransactionSchema = z.object({
+            id: z.string().uuid(),
+        })
+        const sessionId = req.cookies.session_id
+        const { id } = getTransactionSchema.parse(req.params)
+
+        const transactions = await knex('transactions')
+            .where({ session_id: sessionId, id })
+            .first()
+
+        return res.status(200).send({ transactions })
+    })
+
+    app.get('/summary', { preHandler: [validCookie] }, async (req, res) => {
+        const sessionId = req.cookies.session_id
+        const summary = await knex('transactions')
+            .where({ session_id: sessionId })
+            .sum('amount', { as: 'amount' })
+            .first()
+
+        return res.status(200).send({ summary })
+    })
+}
+
+```
