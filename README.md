@@ -1262,4 +1262,19 @@ Vamos utilizar nosso plugin para criar 2 rotas nesse modulo, a primeira rota vai
 ```
 * Nessa rota estamos validando com o Zod o **id** que está vindo na rota, caso o **id** não seja um **uuid** válido o fastify vai retornar um erro.
 * Após isso vamos buscar no banco de dados a transação com o **id** que foi passado na rota utilizando o método `where` e depois passando o método `first`.
-* Depois apenas retornamos como um objeto para o usuário
+* Depois apenas retornamos como um objeto para o usuário.
+### Resumo da conta
+Em transactions vamos fazer uma rota para fazer um resumo da conta do usuário, essa rota vai retornar a soma de todas as entradas e saidas da conta e mostrar o resultado
+```ts
+    app.get('/summary', async (req, res) => {
+        const summary = await knex('transactions')
+            .sum('amount', { as: 'amount' })
+            .first()
+
+        return res.status(200).send({ summary })
+    })
+```
+Nesse código estamos apenas fazendo uma Query no banco de dados utilizando o Knex, para fazer a soma de todas as entradas e saídas e retornando o resultado.
+* Para realizar essa soma usamos o método `sum()` do Knex, passando o nome da coluna que queremos somar e passando um objeto com o nome que queremos que apareça no resultado `{as: 'amount'}` <- essa linha é como o nome do resultado vai se chamar.
+* Após isso usamos o método `first()` para retornar apenas um resultado.
+    * Você pode testar essa rota utilizando a rota: `http://localhost:5000/transactions/summary`
