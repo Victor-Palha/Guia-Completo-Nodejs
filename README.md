@@ -1463,3 +1463,18 @@ export async function transactionsRoutes(app: FastifyInstance) {
 }
 
 ```
+## Hooks Globais
+Podemos criar um middleware para ser executado em todas as rotas da aplicação ou em todas as rotas dentro de um **Plugin**.
+* Podemos fazer isso de maneira simples, simplesmente chamaremos o método **addHook** do Fastify e passaremos o tipo de **Hook** que queremos.
+* Exemplo:
+```ts
+app.addHook('preHandler', async (req, res) => {
+    console.log('Global Hook')
+})
+```
+* Podemos também chamar uma função de um outro arquivo simplesmente importando ela e passando ela como parâmetro.
+```ts
+app.addHook('preHandler', FunctionTest)
+```
+* Caso ele esteja em um arquivo de plugin, ele só vai valer para aquele grupo de rotas.
+* Caso ele esteja no arquivo principal, ele vai valer para todas as rotas da aplicação.
