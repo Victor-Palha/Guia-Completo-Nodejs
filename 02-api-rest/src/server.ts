@@ -3,9 +3,13 @@ import { knex } from './database'
 import crypto from 'node:crypto'
 import { env } from './env'
 import { transactionsRoutes } from './routes/transactions'
+import cookie from '@fastify/cookie'
 
 // Iniciando APP
 const app = fastify()
+
+// Middlewares
+app.register(cookie)
 
 // Rotas
 app.register(transactionsRoutes, {

@@ -1278,3 +1278,75 @@ Nesse código estamos apenas fazendo uma Query no banco de dados utilizando o Kn
 * Para realizar essa soma usamos o método `sum()` do Knex, passando o nome da coluna que queremos somar e passando um objeto com o nome que queremos que apareça no resultado `{as: 'amount'}` <- essa linha é como o nome do resultado vai se chamar.
 * Após isso usamos o método `first()` para retornar apenas um resultado.
     * Você pode testar essa rota utilizando a rota: `http://localhost:5000/transactions/summary`
+### Cookies com Fastify
+Vamos criar um Cookie com o Fastify utilizando o plugin **fastify-cookie**.
+* Para instalar o plugin basta rodar o comando `npm install @fastify/cookie`
+* Após instalar o plugin vamos importar ele no nosso arquivo **server.ts** e registrar ele no nosso app.
+```ts
+import cookie from '@fastify/cookie'
+
+// Iniciando APP
+const app = fastify()
+
+// Cookies
+app.register(cookie)
+
+// Rotas
+app.register(transactionsRoutes, {
+    prefix: '/transactions',
+})
+```
+Como o cookie vai ser utilizado em todas as rotas, vamos colocar ele no nosso arquivo **server.ts** antes das rotas!
+#### Uma explicação rápida sobre Cookies
+Os cookies são pequenos arquivos de texto que são armazenados no navegador do usuário, eles são utilizados para armazenar informações do usuário, como por exemplo, se o usuário está logado ou não, se o usuário já visualizou alguma mensagem, etc.
+#### Criando cookie no registro
+Vamos criar um cookie no momento em que o usuário registra uma transação, assim quando o usuário acessar a rota de resumo da conta, ele vai ver o resumo da conta dele.
+* Vamos para o arquivo **transactions.ts** para criar o cookie!
+```ts
+app.post('/', async (req, res) => {
+        const createTransactionSchema = z.object({
+            title: z.string(),
+            amount: z.number(),
+            type: z.enum(['credit', 'debit']),
+        })
+
+        const { title, amount, type } = createTransactionSchema.parse(req.body)
+        // session_id is a cookie
+        let sessionId = req.cookies.session_id
+
+        if (!sessionId) {
+            sessionId = crypto.randomUUID()
+
+            res.cookie('sessionId', sessionId, {
+                path: '/',
+                maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+            })
+        }
+
+        await knex('transactions').insert({
+            id: crypto.randomUUID(),
+            title,
+            amount: type === 'credit' ? amount : amount * -1,
+            session_id: sessionId,
+        })
+
+        return res.status(201).send({ message: 'Transaction created' })
+    })
+```
+* Primeiro vamos verificar se o usuário já tem um cookie pelo nome **sessionId**, caso ele não tenha vamos criar um cookie com o nome **sessionId** e vamos passar um valor aleatório para ele para identificação.
+* Para verificar com mais calma é esse código:
+```ts
+// session_id is a cookie
+let sessionId = req.cookies.session_id
+
+if (!sessionId) {
+    sessionId = crypto.randomUUID()
+
+    res.cookie('sessionId', sessionId, {
+        path: '/',
+        maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+    })
+}
+```
+Note que assim que criamos um cookie **CASO** o usuário não tenha, estamos passando um **path** e um **maxAge** para o cookie, o **path** é o caminho que o cookie vai ser utilizado, no nosso caso é o **/** que é a raiz do nosso site, e o **maxAge** é o tempo que o cookie vai ficar armazenado no navegador do usuário, no nosso caso é de 30 dias. Depois enviamos pelo **Response** o cookie para o usuário.
+* Agora podemos trabalhar sabendo que o usuário tem um cookie e isso facilitará na hora da listagem do resumo da conta.
