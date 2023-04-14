@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "lint": "eslint --ext .ts .  --fix"
+    "lint": "eslint --ext .ts .  --fix",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +14,9 @@
   "devDependencies": {
     "@rocketseat/eslint-config": "^1.2.0",
     "@types/node": "^18.15.11",
+    "@types/supertest": "^2.0.12",
     "eslint": "^8.38.0",
+    "supertest": "^6.3.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4",
     "vitest": "^0.30.1"

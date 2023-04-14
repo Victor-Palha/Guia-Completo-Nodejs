@@ -1531,3 +1531,74 @@ Esse comando roda todos os testes presentes na nossa aplicação.
     or
     npm test
 ```
+### Criando teste de Transação
+Agora que já aprendemos como criar um teste simples, vamos criar um teste para a nossa rota de transação.
+* Primeiramente precisamos importar uma outra bibilioteca, que é o **supertest**.
+* O **supertest** é uma biblioteca que nos permite fazer requisições HTTP para a nossa aplicação.
+* Para instalar o **supertest**:
+```bash
+    npm install supertest -D
+    npm install @types/supertest -D
+```
+Agora vamos separar nosso arquivo **server.ts** em dois arquivos, um para a criação do servidor e outro para as rotas e etc.
+* criaremos um novo arquivo na raiz do projeto e chamar ele de `app.ts`.
+```ts
+//App.ts
+import fastify from 'fastify'
+import { transactionsRoutes } from './routes/transactions'
+import cookie from '@fastify/cookie'
+// Iniciando APP
+export const app = fastify()
+
+// Middlewares
+app.register(cookie)
+
+// Rotas
+app.register(transactionsRoutes, {
+    prefix: '/transactions',
+})
+
+```
+Note que toda as configurações do servidor estão no arquivo **app.ts** menos o listen. Isso porquê estamos exportando o app e importando ele no arquivo **server.ts**.
+```ts
+import { env } from './env'
+import { app } from './app'
+// Iniciando Servidor
+app.listen({ port: env.PORT }).then(() => {
+    console.log('Servidor rodando na porta 5000')
+})
+
+```
+Agora podemos testar nosso servidor pelo **supertest** sem ficar levando o servidor para o ar e desligando ele toda hora.
+### Começando os testes
+Agora vamos criar um arquivo para os testes de transação e chamar ele de `transactions.spec.ts` dentro da pasta **tests**.
+```ts
+import { afterAll, beforeAll, test } from 'vitest'
+import request from 'supertest'
+import { app } from '../src/app'
+
+// Antes de todos os testes espero que o app esteja pronto
+beforeAll(async () => {
+    await app.ready()
+})
+
+// Depois de todos os testes fechamos o servidor
+afterAll(async () => {
+    await app.close()
+})
+
+//  Iniciando teste
+test('Create new Transaction', async () => {
+    // Criando servidor e setando rota e json
+    await request(app.server)
+        .post('/transactions')
+        .send({
+            title: 'New Transaction',
+            amount: 100,
+            type: 'credit',
+        })
+        // esperando status 201
+        .expect(201)
+})
+
+```
