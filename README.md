@@ -1639,3 +1639,32 @@ describe('Transactions', () => {
 
 ```
 Desse jeito podemos vizualizar melhor os testes que estão sendo rodados e caso um deles falhe, vamos saber exatamente qual teste falhou.
+### Teste de listagem de transações
+```ts
+// iniciando teste
+    test('Get all Transactions', async () => {
+        // Criando nova transição
+        const responseTransactions = await request(app.server)
+            .post('/transactions')
+            .send({
+                title: 'New Transaction',
+                amount: 100,
+                type: 'credit',
+            })
+        // Pegando cookie
+        const cookie = responseTransactions.headers['set-cookie']
+        // Pegando todas as transações e passando o cookie
+        const listTransactionsResponse = await request(app.server)
+            .get('/transactions')
+            .set('Cookie', cookie)
+            .expect(200)
+        // verificando resultado esperado
+        expect(listTransactionsResponse.body.transactions).toEqual([
+            expect.objectContaining({
+                title: 'New Transaction',
+                amount: 100,
+            }),
+        ])
+    })
+```
+Nesse teste estamos criando uma nova transação e verificando pela rota **GET** a listagem de transações
