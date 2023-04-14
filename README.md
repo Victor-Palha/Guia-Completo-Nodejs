@@ -1880,4 +1880,3 @@ node_modules
 ```
 * Esse arquivo vai fazer o ESlint ignorar esses diretórios.
 * Agora vamos colocar nosso código no GitHub, não vou explicar como fazer isso, pois existem muitos tutoriais na internet.
-### Colocando no ar
