@@ -1668,3 +1668,195 @@ Desse jeito podemos vizualizar melhor os testes que estão sendo rodados e caso 
     })
 ```
 Nesse teste estamos criando uma nova transação e verificando pela rota **GET** a listagem de transações
+### Configurando ambiente de testes
+Nós já vimos que nossos testes estão funcionando, porém temos um problema, toda vez que rodamos os testes ele está usando o ambiente de desenvolvimento, o ideal é que ele use o ambiente de testes.
+* Para isso vamos criar um novo arquivo na raiz do projeto e chamar ele de `.env.test`.
+```ts
+DATABASE_CLIENT="sqlite"
+DATABASE_URL="./db/test.sql"
+```
+* Agora vamos colocar esse arquivo no nosso .gitignore!
+* Depois disso vamos configurar nosso arquivo **index.ts** na pasta **src/env** para que ele use o ambiente de testes.
+* Primeiro vamos mudar a importação do **dotenv** para o seguinte:
+```ts
+import { config } from 'dotenv'
+```
+* Ai faremos uma validação para ver se o ambiente é de testes ou não.
+* Caso ele seja, vamos usar o arquivo **.env.test** e caso não seja, vamos usar o arquivo **.env**.
+```ts
+import { config } from 'dotenv'
+import { z } from 'zod'
+
+if (process.env.NODE_ENV === 'test') {
+    config({ path: '.env.test' })
+} else {
+    config()
+}
+
+const envSchema = z.object({
+    NODE_ENV: z
+        .enum(['development', 'production', 'test'])
+        .default('development'),
+    DATABASE_CLIENT: z.string(),
+    DATABASE_URL: z.string(),
+    PORT: z.number().default(5000),
+})
+
+export const _env = envSchema.safeParse(process.env)
+
+if (_env.success === false) {
+    throw new Error('Invalid env')
+}
+
+export const env = _env.data
+
+```
+#### Modificando testes
+Agora que já temos o ambiente de testes configurado, vamos modificar os testes para que eles usem o ambiente de testes.
+* Um dos principais problemas que podem surgir é que o banco de dados de testes não está criado, para isso vamos utilizar uma função nativa do node para rodar comandos no terminal e criar as migrations do Knex.
+```ts
+import { afterAll, beforeAll, test, describe, expect, beforeEach } from 'vitest'
+import { execSync } from 'node:child_process'
+import request from 'supertest'
+import { app } from '../src/app'
+
+// Testes de Transações
+describe('Transactions', () => {
+    // Antes de todos os testes espero que o app esteja pronto
+    beforeAll(async () => {
+        await app.ready()
+    })
+
+    // Depois de todos os testes fechamos o servidor
+    afterAll(async () => {
+        await app.close()
+    })
+
+    beforeEach(() => {
+        // Criando banco de dados de teste
+        execSync('npx knex migrate:rollback --all')
+        execSync('npx knex migrate:latest')
+    })
+
+    //  Iniciando teste
+    test('Create new Transaction', async () => {
+        // Criando servidor e setando rota e json
+        await request(app.server)
+            .post('/transactions')
+            .send({
+                title: 'New Transaction',
+                amount: 100,
+                type: 'credit',
+            })
+            // esperando status 201
+            .expect(201)
+    })
+    // iniciando teste
+    test('Get all Transactions', async () => {
+        // Criando nova transição
+        const responseTransactions = await request(app.server)
+            .post('/transactions')
+            .send({
+                title: 'New Transaction',
+                amount: 100,
+                type: 'credit',
+            })
+        // Pegando cookie
+        const cookie = responseTransactions.headers['set-cookie']
+        // Pegando todas as transações e passando o cookie
+        const listTransactionsResponse = await request(app.server)
+            .get('/transactions')
+            .set('Cookie', cookie)
+            .expect(200)
+        // verificando resultado esperado
+        expect(listTransactionsResponse.body.transactions).toEqual([
+            expect.objectContaining({
+                title: 'New Transaction',
+                amount: 100,
+            }),
+        ])
+    })
+})
+
+```
+Note que estamos usando o **beforeEach** para que antes de cada teste ele rode as migrations do Knex com o método **execSync** do Node.
+* Pronto, agora estamos criando um ambiente isolado onde todos os testes são completamente isolados um dos outros, legal, né?
+### Testando as ultimas rotas
+```ts
+    // iniciando teste de transação específica
+    test('Get specific Transaction', async () => {
+        // Criando nova transição
+        const responseTransactions = await request(app.server)
+            .post('/transactions')
+            .send({
+                title: 'New Transaction',
+                amount: 100,
+                type: 'credit',
+            })
+
+        // Pegando cookie
+
+        const cookie = responseTransactions.headers['set-cookie']
+
+        // Pegando todas as transações e passando o cookie
+        const listTransactionsResponse = await request(app.server)
+            .get('/transactions')
+            .set('Cookie', cookie)
+
+        // Pegando id da transação
+        const { id } = listTransactionsResponse.body.transactions[0]
+
+        // Pegando transação específica
+        const specificTransactionResponse = await request(app.server)
+            .get(`/transactions/${id}`)
+            .set('Cookie', cookie)
+            .expect(200)
+
+        // verificando resultado esperado
+        expect(specificTransactionResponse.body.transactions).toEqual(
+            expect.objectContaining({
+                title: 'New Transaction',
+                amount: 100,
+            }),
+        )
+    })
+
+    // iniciando teste de sumário de transações
+    test('Get summary of Transactions', async () => {
+        // Criando nova transição
+        const responseTransactions = await request(app.server)
+            .post('/transactions')
+            .send({
+                title: 'New Transaction',
+                amount: 1000,
+                type: 'credit',
+            })
+
+        // Pegando cookie
+
+        const cookie = responseTransactions.headers['set-cookie']
+
+        // Criando outra transação
+        await request(app.server)
+            .post('/transactions')
+            .set('Cookie', cookie)
+            .send({
+                title: 'Debit Transaction',
+                amount: 400,
+                type: 'debit',
+            })
+
+        // Pegando todas as transações e passando o cookie
+        const listTransactionsSummary = await request(app.server)
+            .get('/transactions/summary')
+            .set('Cookie', cookie)
+            .expect(200)
+
+        // verificando resultado esperado
+        expect(listTransactionsSummary.body.summary).toEqual(
+            expect.objectContaining({
+                amount: 600,
+            }),
+        )
+    })
+```

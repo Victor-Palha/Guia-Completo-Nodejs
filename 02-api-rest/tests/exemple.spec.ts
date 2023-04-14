@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 //  Teste de exemplo
-test('testando test?', () => {
+test.skip('testando test?', () => {
     // fazer uma ação
     const response = true
     // O resultado esperado TEM que ser igual ao resultado da ação
