@@ -1,7 +1,7 @@
 Galera que está lendo esse texto, isso aqui não tem nada haver com o estudo de Node, é apenas um trabalho a parte que tenho que apresentar então só ignorem!
 
 # Introduction:
-Well, good morning everyone! I'm here to talk about "what I would do if I could turn myself invisible whenever I want." After thinking for too long, I didn't have an answer to this question. Then I remembered the story of the Ring of Gyges. Maybe some of you don't know about this tale, but it is a very interesting one.
+Well, good morning everyone! I'm here to talk about "what I would do if I could turn myself invisible whenever I want." After thinking for too long, I didn't have an answer to this question. Then I remembered the story about the Ring of Gyges. Maybe some of you don't know about this tale, but it is a very interesting one.
 
 # The History of the Ring of Gyges:
 The story of the Ring of Gyges is a moral tale narrated by Plato in his book "The Republic." The story follows the journey of a shepherd named Gyges, who finds a magical ring that grants him the power to become invisible.
