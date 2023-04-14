@@ -1478,3 +1478,56 @@ app.addHook('preHandler', FunctionTest)
 ```
 * Caso ele esteja em um arquivo de plugin, ele só vai valer para aquele grupo de rotas.
 * Caso ele esteja no arquivo principal, ele vai valer para todas as rotas da aplicação.
+## Testes automatizados
+1. O que são testes automatizados?
+    * Testes automatizados são testes que são executados por um programa, ou seja, não são testes manuais.
+    * Testes automatizados são muito importantes para garantir que o código que você escreveu está funcionando da maneira que você espera.
+    * Testes automatizados são muito importantes para garantir que o código que você escreveu não vai quebrar quando você fizer uma alteração.
+2. Como fazer testes automatizados?
+    * Existem várias formas de fazer testes automatizados, mas a mais comum é usando o **Jest** e o **Vitest**.
+### Tipos de testes
+1. Testes unitários
+    * Testes unitários são testes que testam uma função ou um método em si.
+2. Testes de integração
+    * Testes de integração são testes que testam a integração entre duas ou mais funções ou métodos.
+3. Testes de e2e
+    * Testes de e2e são testes que testam a aplicação como um todo, ou seja, testam a aplicação como se fosse um usuário.
+
+### Criando teste automatizados
+* Vamos criar nosso primeiro teste automatizado utilizando o **Vitest**.
+* Para instalar o **Vitest**:
+```bash
+    npm install vitest -D
+```
+* Depois de instalar o **Vitest** vamos criar uma pasta na raiz do projeto e chamar ela de `test`.
+* Agora vamos criar um arquivo dentro da pasta `test` e chamar ele de `transactions.spec.ts`.
+    * OBS: O nome do arquivo precisa terminar com `.spec.ts` ou `.test.ts` para o **Vitest** reconhecer como um arquivo de teste.
+* Agora podemos importar o método `test` do **Vitest** e criar nosso primeiro teste.
+* Agora importando o método `expect` do **Vitest**, o expect é o método para testar se o resultado do teste é igual ao resultado esperado, caso não seja ele gera um erro.
+* O `test` recebe dois parâmetros, o primeiro é o nome do teste e o segundo é uma função que vai conter o teste em si.
+```ts
+import { test, expect } from 'vitest'
+//  Teste de exemplo
+test('testando test?', () => {
+    // fazer uma ação
+    const response = true
+    // O resultado esperado TEM que ser igual ao resultado da ação
+    expect(response).toEqual(true)
+})
+```
+* Para testar a nossa aplicação, podemos rodar o comando:
+```bash
+    npx vitest
+```
+Esse comando roda todos os testes presentes na nossa aplicação.
+* Podemos também criar um script no nosso `package.json` para rodar os testes.
+```json
+    "scripts": {
+        "test": "vitest"
+    }
+```
+```bash
+    npm run test
+    or
+    npm test
+```
