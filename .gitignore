@@ -1,5 +1,12 @@
+# Dependencies
 */node_modules
-*/db/app.sql
-*/db/test.sql
+
+# Database
+*/db/*.sql
+
+# Enviroment
 */.env
 */.env.test
+
+# Build
+*/build

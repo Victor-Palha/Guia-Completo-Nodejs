@@ -1860,3 +1860,24 @@ Note que estamos usando o **beforeEach** para que antes de cada teste ele rode a
         )
     })
 ```
+## Preparando Deploy
+Para fazer o deploy de uma aplicação, precisamos transformar o código Typescript em Javascript, para isso vamos usar o **tsup**.
+```bash
+npm i tsup -D
+```
+Agora vamos no package.json e vamos adicionar o seguinte script:
+```json
+  "scripts": {
+    "build": "tsup src --out-dir build"
+  },
+```
+Agora rodando o comando `npm run build` vamos gerar uma pasta chamada **build** que vai conter o código Javascript da nossa aplicação.
+* Para testar podemos usar o comando `node build/server.js` e ver se a aplicação está funcionando.
+* Agora vamos criar na raiz do projeto um arquivo chamado **.eslintignore** e vamos adicionar o seguinte conteúdo:
+```
+build
+node_modules
+```
+* Esse arquivo vai fazer o ESlint ignorar esses diretórios.
+* Agora vamos colocar nosso código no GitHub, não vou explicar como fazer isso, pois existem muitos tutoriais na internet.
+### Colocando no ar
