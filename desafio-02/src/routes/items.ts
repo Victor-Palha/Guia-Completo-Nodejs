@@ -44,8 +44,25 @@ export async function ItemsRoutes(app: FastifyInstance){
     })
     // get all items
     app.get('/', async (req, res) => {
-        const diet = await knex('diets').from('diets').where('id_user', req.user_id).join('items', 'diets.id_item', '=', 'items.id_item')
+        const diet = await knex('diets').select('items.*').where('id_user', req.user_id).join('items', 'diets.id_item', 'items.id_item')
         return res.status(200).send({ diet })
+    })
+    // Delete item
+    app.delete('/:id', async (req, res) => {
+        const deleteItemSchema = z.object({
+            id: z.string()
+        })
+        const id_item = deleteItemSchema.parse(req.params).id
+
+        const exits = await knex('diets').where('id_item', id_item)
+        
+        if(exits.length === 0 || !exits){
+            return res.status(404).send({ error: 'Item not found!' })
+        }
+
+        await knex('diets').where('id_item', id_item).delete()
+        await knex('items').where('id_item', id_item).delete()
+        return res.status(200).send({ message: 'Item Deleted!' })
     })
 
 }
