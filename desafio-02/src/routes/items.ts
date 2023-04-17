@@ -5,6 +5,10 @@ import { randomUUID } from "crypto";
 import { authValidate } from "../middlewares/authValidate";
 import { itemValidate } from "../middlewares/itemValidate";
 
+type Sequence = {
+    sequence: string
+}
+
 export async function ItemsRoutes(app: FastifyInstance){
     //middleware
     app.addHook('preHandler', authValidate)
@@ -79,11 +83,11 @@ export async function ItemsRoutes(app: FastifyInstance){
             id: z.string()
         })
         const updateItemSchema = z.object({
-            name: z.string(),
-            description: z.string(),
-            date: z.string(),
-            time: z.string(),
-            in_diet: z.coerce.boolean(),
+            name: z.string().optional(),
+            description: z.string().optional(),
+            date: z.string().optional(),
+            time: z.string().optional(),
+            in_diet: z.coerce.boolean().optional(),
         })
         const id_item  = selectItemIdSchema.parse(req.params).id
         
@@ -98,5 +102,45 @@ export async function ItemsRoutes(app: FastifyInstance){
         })
         return res.status(200).send({ message: 'Item Updated!' })
     })
+    // get the sum of all items in diet
+    app.get('/sum', async (req, res) => {
+        const sum = await knex('diets').where('id_user', req.user_id)
+        return res.status(200).send({ total: sum.length })
+    })
+    // get all healthy items
+    app.get('/healthy', async (req, res) => {
+        const healthy = await knex('diets').where( 'id_user', req.user_id )
+            .join('items', 'diets.id_item', 'items.id_item')
+            .where('in_diet', true)
 
+        return res.status(200).send({ healthy: healthy.length })
+    })
+    // get all no healthy items
+    app.get('/unhealthy', async (req, res) => {
+        const unhealthy = await knex('diets').where( 'id_user', req.user_id )
+            .join('items', 'diets.id_item', 'items.id_item')
+            .where('in_diet', false)
+
+        return res.status(200).send({ unhealthy: unhealthy.length })
+    })
+    // best sequence
+    app.get('/sequence', async (req, res) => {
+        const sequence = await knex('diets')
+            .where( 'id_user', req.user_id )
+            .join('items', 'diets.id_item', 'items.id_item')
+            .where('in_diet', true)
+            .orderBy('date')
+            .groupBy('date')
+            .select(knex.raw('group_concat(date) as sequence'))
+
+            
+        const result = sequence.map( (item: any) => {
+            let total = item.sequence.split(',')
+            return {
+                day: total[0],
+                sequence: total.length
+            }
+        })
+        return res.status(200).send( result )
+    })
 }

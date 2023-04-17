@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { hash, compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { env } from "../env";
-//91febab2c08e640d214a63d72ab66cf4
+
 
 export async function UsersRoutes(app: FastifyInstance){
     app.post('/', async (req, res) => {
