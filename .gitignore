@@ -3,6 +3,7 @@
 
 # Database
 */db/*.sql
+*/database/*.sql
 
 # Enviroment
 */.env

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +24,10 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/knex": "^0.16.1",
     "@types/node": "^18.15.11",
+    "@types/supertest": "^2.0.12",
+    "supertest": "^6.3.3",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^0.30.1"
   }
 }
