@@ -17,6 +17,7 @@
     "@typescript-eslint/eslint-plugin": "5.59.0",
     "@typescript-eslint/parser": "5.59.0",
     "eslint": "8.39.0",
+    "prisma": "4.13.0",
     "tsup": "6.7.0",
     "tsx": "3.12.6",
     "typescript": "5.0.4"

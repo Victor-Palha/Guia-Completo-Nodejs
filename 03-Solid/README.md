@@ -125,3 +125,54 @@ Vamos configurar os alias para facilitar a importação de arquivos, para isso v
     }, 
 ```
 Dessa forma quando formos importar um arquivo vamos usar o alias `@` e não mais o caminho relativo.
+## Prisma.io Fundamentos
+O prisma é um ORM que facilita a conexão com o banco de dados e abstrai bastante coisas o que facilita imensamente nosso trabalho com databases, vamos instalar as dependencias:
+```bash
+npm install prisma -D
+npx prisma init
+```
+O comando `npx prisma init` vai criar um arquivo chamado `schema.prisma` na raiz do projeto, Esse arquivo é que faz a conexão com o banco de dados, então vamos entender melhor como funciona!
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+```
+1. Em `generator client` é onde vamos configurar o prisma para gerar o nosso cliente, que é o que vai nos ajudar a fazer as operações no banco de dados.
+2. Em `datasource db` é onde vamos configurar a conexão com o banco de dados, nesse caso estamos usando o postgresql, mas o prisma suporta outros bancos de dados como o mysql, sqlite e mongodb.
+3. Em `url = env("DATABASE_URL")` é onde vamos colocar a url de conexão com o banco de dados, nesse caso estamos usando o `env` para pegar a variável de ambiente `DATABASE_URL` que vamos criar mais tarde.
+### Model Prisma
+Com o arquivo gerado no comando acima, podemos estruturar nosso banco de dados de maneira extremamente simples, vamos criar uma tabela chamada `users`:
+```prisma
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+
+  @@map("users")
+}
+```
+*   A sintaxe para criar uma nova tabela começa com a palavra `model` seguida do **nome da tabela**;
+    * Nesse caso **User**.
+*   Depois abrimos chaves `{}` e dentro delas vamos colocar os campos da tabela, cada campo é separado por uma quebra de linha.
+*   Dentro das chaves colocamos o **nome do campo** seguido de um espaço e o **tipo do campo**.
+    * Nesse caso **id** é do tipo **String**.
+*   Depois do tipo do campo podemos colocar algumas configurações, como por exemplo:
+    * `@id` para definir que o campo é a chave primária da tabela.
+    * `@default(uuid())` para definir um valor padrão para o campo, nesse caso estamos usando a função `uuid()` para gerar um id único.
+    * `@unique` para definir que o campo é único.
+*   Por fim podemos colocar algumas configurações para a tabela, como por exemplo:
+    * `@@map("users")` para definir o nome da tabela no banco de dados, nesse caso estamos definindo como `users`.
+* Agora rodamos o comando para gerar a tipagem do prisma com base na nossas tabelas.
+```bash
+npx prisma generate
+```
+Agora para podemos acessar as tabelas, precisamos instalar uma nova dependencia:
+```bash
+npm install @prisma/client
+```
