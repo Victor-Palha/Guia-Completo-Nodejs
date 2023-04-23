@@ -96,3 +96,23 @@ if(_env.success === false){
 // Exportando as variáveis de ambiente
 export const env = _env.data
 ```
+## EsLint
+Para instalar o eslint vamos rodar o seguinte comando:
+```bash
+npm install eslint -D
+npx eslint --init
+```
+*   **OBS: O `npx eslint --init` é para configurar o eslint, ele vai lhe fazer uma serie de perguntas para você configurar**
+Depois de configurar o eslint ele vai gerar um arquivo chamado `.eslintrc.json` na raiz do projeto, vamos criar um outro arquivo para configurar o eslint, chamado de `.eslintignore` e dentro dele vamos colocar o seguinte código:
+```json
+node_modules
+build
+```
+Agora vamos no `package.json` e vamos adicionar o seguinte código nos scripts:
+```json
+    "lint": "eslint src/** --ext .ts --fix",
+```
+Agora podemos corrigir os erros do eslint rodando o seguinte comando:
+```bash
+npm run lint
+```
