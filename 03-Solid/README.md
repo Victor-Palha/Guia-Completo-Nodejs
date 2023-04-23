@@ -8,11 +8,17 @@ npx tsc --init
 ```
 Depois de instalar as dependencias vamos criar o nosso servidor em 2 arquivos separados
 ```bash
+touch .npmrc
 mkdir src
 cd src
 touch app.ts
 touch server.ts
 ```
+Dentro do arquivo .npmrc vamos adicionar o seguinte código:
+```bash
+save-exact=true
+```
+*   **Esse comando faz com que as dependencias sejam salvas na exata versão que estamos construíndo a API**
 Dentro de app.ts vamos criar a nossa aplicação
 ```ts
 import fastify from 'fastify'
@@ -42,4 +48,51 @@ app.listen({
   // DEV para rodar o projeto em modo de desenvolvimento
     // BUILD para compilar o projeto para JS
         // START para rodar o projeto em modo de produção
+```
+## Variáveis de ambiente
+Na raiz do projeto vamos criar um arquivo chamado `.env` e dentro dele vamos colocar o seguinte código:
+```env
+NODE_ENV=development
+PORT=5000
+```
+E na raiz do projeto vamos criar um arquivo chamado `.env.example` e dentro dele vamos colocar o seguinte código:
+```env
+NODE_ENV=
+PORT=
+```
+Agora vamos instalar as dependencias para trabalhar com variáveis de ambiente:
+```bash
+npm install dotenv
+npm install zod
+```
+Agora vamos configurar e validar nossas variáveis de ambiente (Siga as instruções abaixo a partir da raiz do projeto):
+```bash
+cd src
+mdkir env
+cd env
+touch index.ts
+```
+Dentro de `index.ts` vamos colocar o seguinte código:
+```ts
+// dependencias
+import 'dotenv/config'
+import {z} from 'zod'
+
+// validação das variáveis de ambiente
+const envSchema = z.object({
+    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    PORT: z.coerce.number().default(3000)
+})
+
+// Transformando as variáveis de ambiente
+const _env = envSchema.safeParse(process.env)
+
+// Verificando se as variáveis de ambiente são válidas
+if(_env.success === false){
+    console.log('Invalid Environment variables '+_env.error.format())
+    throw new Error('Invalid Environment variables')
+}
+
+// Exportando as variáveis de ambiente
+export const env = _env.data
 ```
