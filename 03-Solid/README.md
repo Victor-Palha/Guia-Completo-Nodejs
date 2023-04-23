@@ -116,3 +116,12 @@ Agora podemos corrigir os erros do eslint rodando o seguinte comando:
 ```bash
 npm run lint
 ```
+## Alias
+Vamos configurar os alias para facilitar a importação de arquivos, para isso vamos mudar uma configuração simples no `tsconfig.json`:
+```json
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    }, 
+```
+Dessa forma quando formos importar um arquivo vamos usar o alias `@` e não mais o caminho relativo.
