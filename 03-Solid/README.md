@@ -176,3 +176,65 @@ Agora para podemos acessar as tabelas, precisamos instalar uma nova dependencia:
 ```bash
 npm install @prisma/client
 ```
+## Docker Fundamentos
+O que é o Docker?
+*   É uma plataforma de código aberto que permite a criação, o teste e a implantação de aplicativos em contêineres de software.
+*   Os contêineres permitem que você isole seu aplicativo do ambiente de execução e do sistema operacional subjacente.
+*   Os contêineres são semelhantes a máquinas virtuais, mas ao invés de virtualizar o hardware, eles virtualizam o sistema operacional.
+*   Isso permite que você execute vários contêineres isolados em um único host, economizando recursos do sistema operacional.
+*   Os contêineres são mais leves e mais portáteis do que as máquinas virtuais.
+*   Eles compartilham o mesmo kernel do host, o que os torna mais rápidos para iniciar e executar.
+*   Eles também compartilham bibliotecas e ferramentas do host, o que os torna mais eficientes em usar recursos do sistema operacional.
+*   Os contêineres são executados em um ambiente de tempo de execução que é isolado do host, mas que é compartilhado entre os contêineres.
+*   Isso significa que você pode executar vários contêineres em um host e que eles podem se comunicar entre si através de canais bem definidos.
+*   Os contêineres são executados como processos isolados no host.
+### Instalação
+Para instalar o docker no linux, basta seguir esses passos:
+```bash
+    sudo apt-get update
+
+    sudo apt-get install \
+        ca-certificates \
+        curl \
+        gnupg
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+```bash
+    sudo apt-get update
+    docker -v
+```
+Agora vamos achar uma imagem para rodar o docker, vamos usar o postgresql:
+*   **Para visualizar as imagens disponíveis:**
+    * [Hub Docker](https://hub.docker.com/)
+```bash
+docker run --name api-solid-pg -e POSTGRES_USERNAME=docker -e POSTGRES_PASSWORD=docker -e POSTGRES_DATABASE=apisolid -p 5432:5432 bitnami/postgresql:latest
+```
+Vamos por partes:
+    1. `docker run` é o comando para rodar uma imagem.
+    2. `--name api-solid-pg` é o nome que vamos dar para o container.
+    3. `-e POSTGRES_USERNAME=docker` é a variável de ambiente que vamos passar para o container.
+    4. `-p 5432:5432` é a porta que vamos usar para acessar o container, ele direciona a porta _5432_ do container para a porta _5432_ do host.
+    5. `bitnami/postgresql:latest` é a imagem que vamos usar. (Você pode procurar outras imagens no link acima)
+A imagem que criamos fica salva em cache, então podemos parar e iniciar o container quando quisermos:
+```bash
+docker ps                   //Lista os containers em execução
+docker ps -a                //Lista todos os containers
+docker start nome ou id     //Inicia o container
+docker stop nome ou id      //Para o container
+docker rm nome ou id        //Remove o container
+```
+Agora que temos nosso container rodando, vamos acessar o banco de dados com o Prisma
+### Docker com Prisma.io
+Quando iniciamos o prisma com o comando `npx prisma init`, ele gerou no nosso arquivo **.env** uma variável de ambiente chamada `DATABASE_URL`, nesse caso ela está apontando para o banco de dados local, mas agora que temos o docker rodando, vamos apontar para o banco de dados do docker.
+```env
+DATABASE_URL="postgresql://docker:docker@localhost:5432/apisolid?schema=public"
+```
+Agora podemos rodar o comando `npx prisma migrate dev` para criar as tabelas no banco de dados e ao mesmo tempo testar se o container Docker está funcionando como deveria!
+*   Podemos utilizar o próprio Prisma para vizualizar os dados do banco de dados.
+    * `npx prisma studio`
