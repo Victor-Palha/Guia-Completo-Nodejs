@@ -1,0 +1,11 @@
+version: '3' #versão da sintaxe do docker-compose
+
+services:                                   #serviços que vamos usar
+    api-solid-pg:                           #nome do serviço
+        image: bitnami/postgresql:latest    #imagem que vamos usar
+        ports:                              #portas que vamos usar
+            - 5432:5432
+        environment:                        #variáveis de ambiente
+            - POSTGRES_USERNAME=docker
+            - POSTGRES_PASSWORD=docker
+            - POSTGRES_DATABASE=apisolid

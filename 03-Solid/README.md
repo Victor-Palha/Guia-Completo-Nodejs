@@ -176,6 +176,12 @@ Agora para podemos acessar as tabelas, precisamos instalar uma nova dependencia:
 ```bash
 npm install @prisma/client
 ```
+### Comandos fundamentais do Prisma
+*   `npx prisma generate` para gerar a tipagem do prisma com base na nossas tabelas.
+*   `npx prisma migrate dev` para criar as tabelas no banco de dados.
+*   `npx prisma studio` para abrir o prisma studio, que é uma interface gráfica para visualizar as tabelas do banco de dados.
+*   `npx prisma migrate reset` para resetar as tabelas do banco de dados.
+*   `npx prisma migrate deploy` para criar as tabelas no banco de dados.
 ## Docker Fundamentos
 O que é o Docker?
 *   É uma plataforma de código aberto que permite a criação, o teste e a implantação de aplicativos em contêineres de software.
@@ -238,3 +244,29 @@ DATABASE_URL="postgresql://docker:docker@localhost:5432/apisolid?schema=public"
 Agora podemos rodar o comando `npx prisma migrate dev` para criar as tabelas no banco de dados e ao mesmo tempo testar se o container Docker está funcionando como deveria!
 *   Podemos utilizar o próprio Prisma para vizualizar os dados do banco de dados.
     * `npx prisma studio`
+
+## Docker Compose
+O que é o Docker Compose?
+*   É uma ferramenta para definir e executar aplicativos Docker com vários contêineres.
+*   Com o Compose, usamos um arquivo YAML para configurar os serviços de nossos aplicativos.
+*   Então, com um único comando, podemos criar e iniciar todos os serviços de nosso aplicativo a partir de nossa configuração.
+### Como criar um arquivo docker-compose.yml
+Primeiro vamos ir na raiz do nosso projeto e criar um arquivo chamado **docker-compose.yml**.
+```yaml
+version: '3' #versão da sintaxe do docker-compose
+
+services:                                   #serviços que vamos usar
+    api-solid-pg:                           #nome do serviço
+        image: bitnami/postgresql:latest    #imagem que vamos usar
+        ports:                              #portas que vamos usar
+            - 5432:5432
+        environment:                        #variáveis de ambiente
+            - POSTGRES_USERNAME=docker
+            - POSTGRES_PASSWORD=docker
+            - POSTGRES_DATABASE=apisolid
+```
+*   O arquivo docker-compose.yml é um arquivo YAML que define como os contêineres devem ser construídos e executados.
+*   O arquivo docker-compose.yml é usado com o comando `docker compose up` ou `docker-compose up -d`.
+    *   A diferencia entre os dois comandos é que o primeiro mostra os logs do container e o segundo não.
+*   Para parar os containers, basta usar o comando `docker compose stop`.
+*   Para remover os containers, basta usar o comando `docker compose down`.
