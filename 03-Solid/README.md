@@ -176,6 +176,100 @@ Agora para podemos acessar as tabelas, precisamos instalar uma nova dependencia:
 ```bash
 npm install @prisma/client
 ```
+### Criando relacionamentos com o Prisma
+Para criar relacionamentos no prisma, primeiramente você precisa estar familiarizado com os tipos de relacionamentos que existem, que são:
+*   **One to One**
+*   **One to Many**
+*   **Many to Many**
+#### One to One
+Um exemplo de relacionamento One to One é o relacionamento entre um usuário e um perfil, onde um usuário só pode ter um perfil e um perfil só pode pertencer a um usuário, para criar esse relacionamento no prisma vamos fazer o seguinte:
+```prisma
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  profile Profile?
+
+  @@map("users")
+}
+
+model Profile {
+  id String @id @default(uuid())
+  bio String?
+  user User @relation(fields: [user_id], references: [id])
+
+  user_id String
+
+  @@map("profiles")
+}
+```
+*   No model `User` vamos adicionar um campo chamado `profile` do tipo `Profile?`, que é um relacionamento One to One.
+*   No model `Profile` vamos adicionar um campo chamado `user` do tipo `User`, que é um relacionamento One to One.
+*   No model `Profile` vamos adicionar um campo chamado `userId` do tipo `String`, que é um relacionamento One to One.
+#### One to Many
+Um exemplo de relacionamento One to Many é o relacionamento entre um usuário e suas postagens, onde um usuário pode ter várias postagens, mas uma postagem só pode pertencer a um usuário, para criar esse relacionamento no prisma vamos fazer o seguinte:
+```prisma
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  posts Post[]
+
+  @@map("users")
+}
+
+model Post {
+  id String @id @default(uuid())
+  title String
+  content String
+  users User @relation(fields: [user_id], references: [id])
+
+  user_id String
+
+  @@map("posts")
+}
+```
+*   No model `User` vamos adicionar um campo chamado `posts` do tipo `Post[]`, que é um relacionamento One to Many.
+*   No model `Post` vamos adicionar um campo chamado `user` do tipo `User`, que é um relacionamento One to Many.
+*   No model `Post` vamos adicionar um campo chamado `userId` do tipo `String`, que é um relacionamento One to Many.
+#### Many to Many
+Um exemplo de relacionamento Many to Many é o relacionamento entre um usuário e suas postagens favoritas, onde um usuário pode ter várias postagens favoritas e uma postagem pode ser favorita de vários usuários, para criar esse relacionamento no prisma vamos fazer o seguinte:
+```prisma
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  posts Post[]
+
+  @@map("users")
+}
+
+model Post {
+  id String @id @default(uuid())
+  title String
+  content String
+  users User[]
+
+  @@map("posts")
+}
+
+model UserFavoritePost {
+  user_id String
+  post_id String
+
+  @@id([userId, postId])
+  @@map("users_favorite_posts")
+}
+```
+*   No model `User` vamos adicionar um campo chamado `posts` do tipo `Post[]`, que é um relacionamento Many to Many.
+*   No model `Post` vamos adicionar um campo chamado `users` do tipo `User[]`, que é um relacionamento Many to Many.
+*   No model `UserFavoritePost` vamos adicionar um campo chamado `userId` do tipo `String`, que é um relacionamento Many to Many.
+*   No model `UserFavoritePost` vamos adicionar um campo chamado `postId` do tipo `String`, que é um relacionamento Many to Many.
+*   No model `UserFavoritePost` vamos adicionar um campo chamado `@@id` que é uma chave composta, ou seja, uma chave que é composta por mais de um campo.
+
 ### Comandos fundamentais do Prisma
 *   `npx prisma generate` para gerar a tipagem do prisma com base na nossas tabelas.
 *   `npx prisma migrate dev` para criar as tabelas no banco de dados.
