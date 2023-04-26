@@ -22,9 +22,8 @@ export async function userRegister(req: FastifyRequest, res: FastifyReply) {
     } catch (error) {
         if(error instanceof userAlreadyExistsError){
             return res.status(409).send({error: error.message})
-        }else{
-            return res.status(500).send({error: "Internal server error"})
         }
+        throw error
     }
 
     return res.status(201).send()
