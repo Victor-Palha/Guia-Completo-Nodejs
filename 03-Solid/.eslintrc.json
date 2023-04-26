@@ -18,14 +18,8 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "indent": [
-            "error",
-            "tab"
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
+        "indent": "off",
+        "linebreak-style": "off",
         "quotes": [
             "error",
             "double"
