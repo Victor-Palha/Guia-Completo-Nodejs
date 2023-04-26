@@ -364,3 +364,15 @@ services:                                   #serviços que vamos usar
     *   A diferencia entre os dois comandos é que o primeiro mostra os logs do container e o segundo não.
 *   Para parar os containers, basta usar o comando `docker compose stop`.
 *   Para remover os containers, basta usar o comando `docker compose down`.
+## SOLID 
+### O que é SOLID?
+*   É um acrônimo para os cinco primeiros princípios da programação orientada a objetos e design de código identificados por Robert C. Martin (Uncle Bob) por volta do ano 2000.
+*   O acrônimo SOLID foi introduzido por Michael Feathers, após observar que os cinco princípios poderiam se encaixar nesta palavra.
+*   O SOLID é um conjunto de regras que nos ajudam a escrever código mais limpo, mais legível e mais fácil de manter.
+#### D - Dependency Inversion Principle (Princípio da inversão de dependência)
+*   O princípio da inversão de dependência (DIP) é um dos cinco princípios de design de código SOLID.
+*   O DIP afirma que os módulos de alto nível não devem depender de módulos de baixo nível; ambos devem depender de abstrações.
+*   Além disso, as abstrações não devem depender de detalhes; os detalhes devem depender de abstrações.
+*   Em outras palavras, as dependências de alto nível não devem depender de detalhes de baixo nível; os detalhes devem depender de abstrações de alto nível.
+*   O DIP é um princípio muito importante, pois reduz o acoplamento entre módulos de software.
+*   O acoplamento é uma medida da dependência entre dois módulos de software; quanto maior o acoplamento, mais dependente um módulo é de outro.
