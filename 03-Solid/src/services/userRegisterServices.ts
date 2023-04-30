@@ -11,6 +11,7 @@ type UserRegisterServiceProps = {
 type UserRegisterServiceResponse = {
     user: User
 }
+
 export class UserRegisterService {
     constructor(private usersRepository: UserRepository){}
 
