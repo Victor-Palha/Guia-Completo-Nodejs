@@ -376,3 +376,13 @@ services:                                   #serviços que vamos usar
 *   Em outras palavras, as dependências de alto nível não devem depender de detalhes de baixo nível; os detalhes devem depender de abstrações de alto nível.
 *   O DIP é um princípio muito importante, pois reduz o acoplamento entre módulos de software.
 *   O acoplamento é uma medida da dependência entre dois módulos de software; quanto maior o acoplamento, mais dependente um módulo é de outro.
+
+## Factory Pattern
+### O que é Factory Pattern?
+*   O Factory Pattern é um dos padrões de design mais usados principalmente ​​em Java.
+*   Este tipo de padrão de design vem sob o padrão de criação, pois esse padrão fornece uma das melhores maneiras de criar um objeto.
+*   No Factory Pattern, criamos o objeto sem expor a lógica de criação ao cliente e nos referimos ao objeto recém-criado usando uma interface comum.
+*   O Factory Pattern é usado quando temos uma superclasse com várias subclasses e, com base na entrada, queremos retornar uma das subclasses.
+*   Este padrão assume uma superclasse como classe de fábrica e, em seguida, cria o objeto de subclasse.
+### Resumo
+Criaremos uma função que vai receber um parâmetro e vai retornar uma classe, essa classe vai ser a classe que vamos usar para criar o objeto. Assim quando precisamos de um objeto, basta chamar a função passando o parâmetro que ela vai retornar o objeto que precisamos. Isso faz com que economizemos linhas de código e deixe o código mais limpo e legível.
