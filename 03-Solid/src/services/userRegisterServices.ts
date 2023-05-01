@@ -13,19 +13,19 @@ type UserRegisterServiceResponse = {
 }
 
 export class UserRegisterService {
-    constructor(private usersRepository: UserRepository){}
+    constructor(private userRepository: UserRepository){}
 
     async execute({name, email, password}: UserRegisterServiceProps): Promise<UserRegisterServiceResponse>{
         const password_hash = await hash(password, 6)
 
         //validate
-        const userAlready = await this.usersRepository.findByEmail(email)
+        const userAlready = await this.userRepository.findByEmail(email)
         if(userAlready){
             throw new UserAlreadyExistsError
         }
     
         //repository
-        const user = await this.usersRepository.create({name, email, password_hash})
+        const user = await this.userRepository.create({name, email, password_hash})
 
         return { user }
     }

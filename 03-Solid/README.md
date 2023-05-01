@@ -386,3 +386,57 @@ services:                                   #serviços que vamos usar
 *   Este padrão assume uma superclasse como classe de fábrica e, em seguida, cria o objeto de subclasse.
 ### Resumo
 Criaremos uma função que vai receber um parâmetro e vai retornar uma classe, essa classe vai ser a classe que vamos usar para criar o objeto. Assim quando precisamos de um objeto, basta chamar a função passando o parâmetro que ela vai retornar o objeto que precisamos. Isso faz com que economizemos linhas de código e deixe o código mais limpo e legível.
+
+## TDD (Test Driven Development)
+### O que é TDD?
+*   O TDD é uma abordagem de desenvolvimento de software em que os testes são escritos antes de escrever o código.
+### Red
+*   O Red é a primeira etapa do TDD, nessa etapa escrevemos o teste que vai falhar.
+### Green
+*   O Green é a segunda etapa do TDD, nessa etapa escrevemos o código que vai fazer o teste passar.
+### Refactor
+*   O Refactor é a terceira etapa do TDD, nessa etapa refatoramos o código para que ele fique mais limpo e legível.
+#### Dica Vitest
+Para trabalhar com comparação de datas podemos utilizar Mocking do vitest.
+```ts
+import { InMemoryCheckIn } from "@/repositories/in-memory/in-memory-check-in-repository"
+import { beforeEach, describe, expect, it, afterEach, vi } from "vitest"
+import { CheckInService } from "./checkInService"
+import { randomUUID } from "node:crypto"
+
+let inMemory: InMemoryCheckIn
+let sut: CheckInService
+
+describe("Auth service", () => {
+
+    beforeEach(()=> {
+        inMemory = new InMemoryCheckIn()
+        sut = new CheckInService(inMemory)
+        //set timer
+        vi.useFakeTimers()
+    })
+
+    afterEach(()=>{
+        //clear timer
+        vi.clearAllTimers()
+    })
+    
+
+    it("Should not be able to create 2 check-in on same day", async () => {
+
+        vi.setSystemTime(new Date(2023, 7, 28, 10, 0, 0))
+        const checkInData = {
+            gym_id: randomUUID(),
+            user_id: randomUUID(),
+            validated_at: new Date()
+        }
+
+        const {checkIn} = await sut.execute(checkInData)
+        console.log(checkIn.created_at)
+        await expect(()=>
+            sut.execute(checkInData)
+        ).rejects.toBeInstanceOf(Error)
+    })
+
+})
+```

@@ -13,7 +13,7 @@ interface AuthUserResponse {
 }
 
 export class UserAuthenticateService {
-    constructor(private userRepository: UserRepository) {}
+    constructor(private userRepository: UserRepository){}
 
     async execute(data: AuthUserRequest): Promise<AuthUserResponse>{
         // auth

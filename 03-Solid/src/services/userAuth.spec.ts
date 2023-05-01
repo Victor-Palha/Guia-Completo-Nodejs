@@ -38,6 +38,6 @@ describe("Auth service", () => {
             password_hash: await hash("123456", 6)
         })
 
-        expect(async ()=> await sut.execute({email: "john@teste.com", password: "1234567"})).rejects.toBeInstanceOf(InvalidCredentialsError)
+        await expect(()=> sut.execute({email: "john@teste.com", password: "1234567"})).rejects.toBeInstanceOf(InvalidCredentialsError)
     })
 })
