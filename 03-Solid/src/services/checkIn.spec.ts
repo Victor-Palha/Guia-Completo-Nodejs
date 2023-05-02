@@ -86,4 +86,27 @@ describe("Auth service", () => {
         expect(checkIn).toHaveProperty("id")
     })
 
+    it("Should not be able to check in on distant gym", async () => {
+        inMemoryGym.items.push({
+            id: "gym_02",
+            title: "JS/TS GYM",
+            description: "The best gym for JS/TS developers",
+            phone: "123456789",
+            latitude: new Decimal(-23.5156128),
+            longitude: new Decimal(-46.6358589),
+        })
+
+        const checkInData = {
+            gym_id: "gym_02",
+            user_id: randomUUID(),
+            validated_at: new Date(),
+            userLatitude: -23.5491546,
+            userLongitude: -46.6444317
+        }
+
+        await expect(()=>
+            sut.execute(checkInData)
+        ).rejects.toBeInstanceOf(Error)
+        
+    })
 })
