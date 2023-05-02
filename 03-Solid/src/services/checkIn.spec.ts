@@ -9,14 +9,14 @@ let inMemory: InMemoryCheckIn
 let sut: CheckInService
 let inMemoryGym: InMemoryGyms
 
-describe("Auth service", () => {
+describe("Check-ins", () => {
 
     beforeEach(()=> {
         inMemory = new InMemoryCheckIn()
         inMemoryGym = new InMemoryGyms()
         sut = new CheckInService(inMemory, inMemoryGym)
 
-        inMemoryGym.items.push({
+        inMemoryGym.create({
             id: "gym_1",
             title: "JS/TS GYM",
             description: "The best gym for JS/TS developers",
@@ -24,6 +24,7 @@ describe("Auth service", () => {
             latitude: new Decimal(0),
             longitude: new Decimal(0),
         })
+
         //set timer
         vi.useFakeTimers()
     })
