@@ -2,16 +2,28 @@ import { InMemoryCheckIn } from "@/repositories/in-memory/in-memory-check-in-rep
 import { beforeEach, describe, expect, it, afterEach, vi } from "vitest"
 import { CheckInService } from "./checkInService"
 import { randomUUID } from "node:crypto"
+import { InMemoryGyms } from "@/repositories/in-memory/in-memory-gyms-repository"
+import { Decimal } from "@prisma/client/runtime"
 
 let inMemory: InMemoryCheckIn
 let sut: CheckInService
+let inMemoryGym: InMemoryGyms
 
 describe("Auth service", () => {
 
     beforeEach(()=> {
         inMemory = new InMemoryCheckIn()
-        sut = new CheckInService(inMemory)
+        inMemoryGym = new InMemoryGyms()
+        sut = new CheckInService(inMemory, inMemoryGym)
 
+        inMemoryGym.items.push({
+            id: "gym_1",
+            title: "JS/TS GYM",
+            description: "The best gym for JS/TS developers",
+            phone: "123456789",
+            latitude: new Decimal(0),
+            longitude: new Decimal(0),
+        })
         //set timer
         vi.useFakeTimers()
     })
@@ -24,9 +36,11 @@ describe("Auth service", () => {
     it("Should be able to create a new check in", async () => {
 
         const checkInData = {
-            gym_id: randomUUID(),
+            gym_id: "gym_1",
             user_id: randomUUID(),
-            validated_at: new Date()
+            validated_at: new Date(),
+            userLatitude: 0,
+            userLongitude: 0
         }
 
         const { checkIn } = await sut.execute(checkInData)
@@ -38,9 +52,11 @@ describe("Auth service", () => {
 
         vi.setSystemTime(new Date(2023, 7, 28, 10, 0, 0))
         const checkInData = {
-            gym_id: randomUUID(),
+            gym_id: "gym_1",
             user_id: randomUUID(),
-            validated_at: new Date()
+            validated_at: new Date(),
+            userLatitude: 0,
+            userLongitude: 0
         }
 
         const {checkIn} = await sut.execute(checkInData)
@@ -54,9 +70,11 @@ describe("Auth service", () => {
         vi.setSystemTime(new Date(2023, 7, 27, 10, 0, 0))
 
         const checkInData = {
-            gym_id: randomUUID(),
+            gym_id: "gym_1",
             user_id: randomUUID(),
-            validated_at: new Date()
+            validated_at: new Date(),
+            userLatitude: 0,
+            userLongitude: 0
         }
 
         await sut.execute(checkInData)
