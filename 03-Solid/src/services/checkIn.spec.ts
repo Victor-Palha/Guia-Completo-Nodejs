@@ -60,7 +60,7 @@ describe("Check-ins", () => {
             userLongitude: 0
         }
 
-        const {checkIn} = await sut.execute(checkInData)
+        await sut.execute(checkInData)
         //console.log(checkIn.created_at)
         await expect(()=>
             sut.execute(checkInData)
