@@ -14,12 +14,12 @@ describe("validade Check-ins", () => {
         sut = new ValidateCheckInService(inMemory)
 
         //set timer
-        //vi.useFakeTimers()
+        vi.useFakeTimers()
     })
 
     afterEach(()=>{
         //clear timer
-        //vi.clearAllTimers()
+        vi.clearAllTimers()
     })
     
     it("Should be able to validate check-in", async () => {
@@ -44,4 +44,20 @@ describe("validade Check-ins", () => {
         ).rejects.toBeInstanceOf(ResourceNotFound)
     })
 
+    it("should not be able to validate a check-in after 20 minutes", async ()=>{
+        vi.setSystemTime(new Date(2023, 0, 1, 13, 40))
+        const newCheckIn = await inMemory.create({
+            gym_id: "gym_1",
+            user_id: "user_1",
+        })
+
+        const twentyOneMinutesLater = 21 * 60 * 1000
+        vi.advanceTimersByTime(twentyOneMinutesLater)
+
+        await expect(()=>
+            sut.execute({
+                checkIn_id: newCheckIn.id
+            })
+        ).rejects.toBeInstanceOf(Error)
+    })
 })

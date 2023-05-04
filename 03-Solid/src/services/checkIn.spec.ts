@@ -61,7 +61,7 @@ describe("Check-ins", () => {
         }
 
         const {checkIn} = await sut.execute(checkInData)
-        console.log(checkIn.created_at)
+        //console.log(checkIn.created_at)
         await expect(()=>
             sut.execute(checkInData)
         ).rejects.toBeInstanceOf(Error)
