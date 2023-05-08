@@ -440,3 +440,20 @@ describe("Auth service", () => {
 
 })
 ```
+
+## Autenticação
+### JWT (JSON Web Token)
+Para utilizar o JWT na nossa aplicação que utiliza o Fastify, vamos instalar a biblioteca:
+```bash
+npm install @fastify/jwt
+```
+Agora no arquivo principal da nossa aplicação, vamos importar a biblioteca e registrar ela no nosso servidor:
+```ts
+app.register(fastifyJwt, {
+    secret: env.JWT_SECRET // O segredo está no .env do projeto
+})
+```
+No Fastify, podemos validar o token utilizando a função `jwtVerify`
+```ts
+await req.jwtVerify() //Fastify Rquest -> Token on header
+```
