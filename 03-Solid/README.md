@@ -457,3 +457,63 @@ No Fastify, podemos validar o token utilizando a função `jwtVerify`
 ```ts
 await req.jwtVerify() //Fastify Rquest -> Token on header
 ```
+## Teste e2e
+### Criando environment para teste
+```bash
+mkdir vistest-enviroment-prisma
+cd vistest-enviroment-prisma
+npm init -y
+touch prisma-test-environment.ts
+```
+*   **Package.json**
+```json
+{
+  "name": "vitest-environment-prisma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "prisma-test-environment.ts",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+```
+*   **prisma-test-environment.ts**
+```ts
+import {Environment} from "vitest"
+
+export default <Environment>{
+    name: "prisma",
+    async setup() {
+        // setup environment
+        console.log("Start")
+
+        return {
+            async teardown(){
+                // teardown environment
+                console.log("Finish")
+            }
+        }
+    },
+}
+```
+*  **vite.config.ts**
+```ts
+import { defineConfig } from "vitest/config"
+import tsconfigPaths from "vite-tsconfig-paths"
+
+export default defineConfig({
+    plugins: [tsconfigPaths()],
+    test: {
+        environmentMatchGlobs: [["src/http/controllers/**", "prisma"]] // vitest-environment <prisma> <= esse nome é o segundo parametro
+    }
+})
+```
+*   **npm link**
+```bash
+cd prisma/vistest-enviroment-prisma
+npm link # tem que ter o package.json
+cd ../..
+npm link vistest-enviroment-prisma
+
+npm run test
+```
