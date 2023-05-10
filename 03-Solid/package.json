@@ -8,9 +8,13 @@
     "build": "tsup src --out-dir build",
     "start": "node build/server.js",
     "lint": "eslint src/** --ext .ts --fix",
+
+    "test:create-environment": "npm link ./prisma/vitest-environment-prisma",
+    "test:install-environment": "npm link vitest-environment-prisma",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "test:e2e": "vitest run --dir src/http"
   },
   "keywords": [],
   "author": "",
@@ -18,11 +22,13 @@
   "devDependencies": {
     "@types/bcryptjs": "2.4.2",
     "@types/node": "18.16.0",
+    "@types/supertest": "2.0.12",
     "@typescript-eslint/eslint-plugin": "5.59.0",
     "@typescript-eslint/parser": "5.59.0",
     "@vitest/ui": "0.30.1",
     "eslint": "8.39.0",
     "prisma": "4.13.0",
+    "supertest": "6.3.3",
     "tsup": "6.7.0",
     "tsx": "3.12.6",
     "typescript": "5.0.4",
