@@ -16,5 +16,5 @@ export async function historyCheckIn(req:FastifyRequest, res: FastifyReply){
         user_id: req.user.sub
     })
 
-    return res.status(200).send(checkIns)
+    return res.status(200).send({checkIns})
 }

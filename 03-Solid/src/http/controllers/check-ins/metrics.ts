@@ -9,5 +9,5 @@ export async function userCheckInMetrics(req:FastifyRequest, res: FastifyReply){
         user_id: req.user.sub
     })
 
-    return res.status(200).send(totalCheckIns)
+    return res.status(200).send({totalCheckIns})
 }
