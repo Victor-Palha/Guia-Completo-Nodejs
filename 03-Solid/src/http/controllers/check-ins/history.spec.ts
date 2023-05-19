@@ -1,7 +1,7 @@
 import { app } from "@/app"
 import {it, describe, afterAll, beforeAll, expect} from "vitest"
 import request from "supertest"
-import { createAndAuthenticateUser } from "@/lib/test/create-and-authenticate-user"
+import { createAndAuthenticateUser } from "@/utils/test/create-and-authenticate-user"
 import { prisma } from "@/lib/prisma"
 
 describe("Check-in history (e2e)", async ()=>{
