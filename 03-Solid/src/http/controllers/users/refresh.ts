@@ -4,13 +4,19 @@ export async function refreshUser(req: FastifyRequest, res: FastifyReply){
 
     await req.jwtVerify({onlyCookie: true})
 
-        const token = await res.jwtSign({}, {
+    const {role} = req.user
+
+        const token = await res.jwtSign({
+            role
+        }, {
             sign:{
                 sub: req.user.sub,
             }
         })
 
-        const refreshToken = await res.jwtSign({},{
+        const refreshToken = await res.jwtSign({
+            role
+        },{
             sign: {
                 sub: req.user.sub,
                 expiresIn: "7d"
