@@ -47,7 +47,7 @@ describe("validate check-in (e2e)", async ()=>{
                 id: checkIn.id
             }
         })
-
+        
         expect(checkIn.validated_at).toEqual(expect.any(Date))
     })
 })
