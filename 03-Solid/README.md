@@ -517,3 +517,39 @@ npm link vistest-enviroment-prisma
 
 npm run test
 ```
+
+## CI (Continuous Integration)
+### O que é CI?
+*   O CI é uma prática de desenvolvimento de software em que os desenvolvedores integram o código em um repositório compartilhado várias vezes ao dia.
+*   Cada integração de código é verificada por uma compilação automatizada, permitindo que as equipes detectem problemas cedo.
+*   Ao integrar regularmente, você pode detectar erros rapidamente e localizá-los com mais facilidade.
+*   Além disso, a automação de compilações e testes aumenta a confiança na versão do software.
+### Github Actions
+*   O Github Actions é uma ferramenta de CI/CD que permite automatizar tarefas dentro do Github.
+*   Com o Github Actions podemos criar workflows que vão ser executados quando alguma ação for disparada.
+*   Podemos criar workflows para rodar testes, fazer deploy, entre outras coisas.
+#### Criando workflow
+*   Para criar um workflow, basta criar um arquivo na pasta `.github/workflows` com o nome que você quiser.
+*   No arquivo, vamos definir o nome do workflow, quando ele vai ser executado e o que ele vai fazer.
+*   exemplo de workflow:
+```yml
+name: Run Unit Tests
+
+on: [push]
+
+jobs:
+  run-unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/chackout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      
+      - run: npm ci
+
+      - run: npm run test
+```
