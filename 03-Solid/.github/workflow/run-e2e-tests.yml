@@ -12,7 +12,7 @@ jobs:
         image: bitnami/postgresql:latest    #imagem que vamos usar
         ports:                              #portas que vamos usar
           - 5432:5432
-        environment:                        #variáveis de ambiente
+        env:                        #variáveis de ambiente
           - POSTGRES_USERNAME=docker
           - POSTGRES_PASSWORD=docker
           - POSTGRES_DATABASE=apisolid
