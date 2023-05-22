@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-latest
 
     services:                                   #serviços que vamos usar
-      prostgres:                           #nome do serviço
+      prostgres:                        #nome do serviço
         image: bitnami/postgresql:latest    #imagem que vamos usar
         ports:                              #portas que vamos usar
-          - 5432:5432
+          5432:5432
         env:                        #variáveis de ambiente
-          - POSTGRES_USERNAME=docker
-          - POSTGRES_PASSWORD=docker
-          - POSTGRES_DATABASE=apisolid
+          POSTGRES_USERNAME:docker
+          POSTGRES_PASSWORD:docker
+          POSTGRES_DATABASE:apisolid
 
     steps:
       - uses: actions/checkout@v3
