@@ -1,0 +1,21 @@
+{
+  "name": "04-ddd",
+  "version": "1.0.0",
+  "description": "DDD é uma abordagem que visa a modelagem de domínios complexos, onde o foco principal é a lógica do negócio. Com isso, o DDD ajuda a manter o foco no que realmente importa, que é o negócio, e não na tecnologia. Além disso, o DDD ajuda a manter o código mais organizado e de fácil manutenção.\r ### Domínio\r Domínio é o contexto onde o software está inserido. Por exemplo, se estamos desenvolvendo um software para uma empresa de vendas, o domínio é o contexto de vendas. O domínio é o que realmente importa no DDD, pois é nele que vamos focar a nossa atenção.\r ### Domain Expert\r Domain Expert é o especialista no domínio. É a pessoa que conhece o negócio e sabe como ele funciona. É muito importante que o desenvolvedor converse com o Domain Expert para entender como o negócio funciona e como o software deve se comportar.\r ### Ubiquitous Language\r Ubiquitous Language é a linguagem universal. É a linguagem que o Domain Expert utiliza para se comunicar com o desenvolvedor. É muito importante que o desenvolvedor utilize a mesma linguagem do Domain Expert, pois isso ajuda a evitar problemas de comunicação.",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.2.5",
+    "typescript": "^5.1.3",
+    "vite-tsconfig-paths": "^4.2.0",
+    "vitest": "^0.31.4"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.8"
+  }
+}
