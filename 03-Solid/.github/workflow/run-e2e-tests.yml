@@ -1,0 +1,31 @@
+name: Run E2E tests
+
+on: [pull_request]
+
+jobs:
+  run-e2e-tests:
+    name: Run E2E tests
+    runs-on: ubuntu-latest
+
+    services:                                   #serviços que vamos usar
+      prostgres:                        #nome do serviço
+        image: bitnami/postgresql:latest    #imagem que vamos usar
+        ports:                              #portas que vamos usar
+          5432:5432
+        env:                        #variáveis de ambiente
+          POSTGRES_USERNAME:docker
+          POSTGRES_PASSWORD:docker
+          POSTGRES_DATABASE:apisolid
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run tests:e2e
+        env:
+          JWT_SECRET: testing
+          DATABASE_URL: "postgresql://docker:docker@localhost:5432/apisolid?schema=public"

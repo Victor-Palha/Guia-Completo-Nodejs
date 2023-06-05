@@ -16,7 +16,7 @@ interface ValidateResponse{
 export class ValidateCheckInService{
     constructor(private checkInsRepository: CheckInsRepository){}
     async execute({checkIn_id}: ValidateRequest): Promise<ValidateResponse>{
-        const checkIn = await this.checkInsRepository.findById(checkIn_id)
+        let checkIn = await this.checkInsRepository.findById(checkIn_id)
 
         if(!checkIn){
             throw new ResourceNotFound
@@ -30,8 +30,8 @@ export class ValidateCheckInService{
 
         checkIn.validated_at = new Date()
 
-        await this.checkInsRepository.save(checkIn)
+        checkIn = await this.checkInsRepository.save(checkIn)
 
-        return {checkIn: checkIn}
+        return {checkIn}
     }
 }

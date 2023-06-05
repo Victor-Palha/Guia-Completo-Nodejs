@@ -1,7 +1,7 @@
 import { app } from "@/app"
 import {it, describe, afterAll, beforeAll, expect} from "vitest"
 import request from "supertest"
-import { createAndAuthenticateUser } from "@/lib/test/create-and-authenticate-user"
+import { createAndAuthenticateUser } from "@/utils/test/create-and-authenticate-user"
 
 describe("Search Gym (e2e)", async ()=>{
     beforeAll(async ()=>{
@@ -14,7 +14,7 @@ describe("Search Gym (e2e)", async ()=>{
 
     it("Should be able to Search a gym by title", async ()=>{
         
-        const { token } = await createAndAuthenticateUser(app)
+        const { token } = await createAndAuthenticateUser(app, true)
 
         
         await request(app.server).post("/gyms").set("Authorization", `Bearer ${token}`).send({
