@@ -13,7 +13,7 @@ const envSchema = z.object({
         .default('development'),
     DATABASE_CLIENT: z.string(),
     DATABASE_URL: z.string(),
-    PORT: z.number().default(5000),
+    PORT: z.coerce.number().default(5000),
 })
 
 export const _env = envSchema.safeParse(process.env)

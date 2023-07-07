@@ -24,15 +24,18 @@ describe('Transactions', () => {
     //  Iniciando teste
     test('Create new Transaction', async () => {
         // Criando servidor e setando rota e json
-        await request(app.server)
+        const newRequest = await request(app.server)
             .post('/transactions')
             .send({
                 title: 'New Transaction',
                 amount: 100,
+                description: 'New Transaction',
                 type: 'credit',
             })
             // esperando status 201
             .expect(201)
+        // verificando resultado esperado
+        expect(newRequest.body).toEqual({ message: 'Transaction created' })
     })
 
     // iniciando teste
@@ -43,6 +46,7 @@ describe('Transactions', () => {
             .send({
                 title: 'New Transaction',
                 amount: 100,
+                description: 'New Transaction',
                 type: 'credit',
             })
         // Pegando cookie
@@ -69,6 +73,7 @@ describe('Transactions', () => {
             .send({
                 title: 'New Transaction',
                 amount: 100,
+                description: 'New Transaction',
                 type: 'credit',
             })
 
@@ -107,6 +112,7 @@ describe('Transactions', () => {
             .send({
                 title: 'New Transaction',
                 amount: 1000,
+                description: 'New Transaction',
                 type: 'credit',
             })
 
@@ -121,6 +127,7 @@ describe('Transactions', () => {
             .send({
                 title: 'Debit Transaction',
                 amount: 400,
+                description: 'New Transaction',
                 type: 'debit',
             })
 
