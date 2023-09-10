@@ -1,15 +1,21 @@
-import {it, expect} from "vitest"
+import {expect, test} from "vitest"
 import { AnswerQuestionUseCase } from "./answer-question"
+import { AnswerRepository } from "../repositories/answers-repository"
 
-it("should be able to answer a question", ()=>{
-    const answerQuestion = new AnswerQuestionUseCase()
 
-    const answer = answerQuestion.execute({
-        instructorId: "1",
-        questionId: "1",
-        answerContent: "Answer"
+const fakeAnswerRepository: AnswerRepository = {
+    async create(answer){
+        return
+    }
+}
+test("Should be able to Answer a question", async ()=>{
+    const AnswerQuestion = new AnswerQuestionUseCase(fakeAnswerRepository)
+
+    const answer = await AnswerQuestion.execute({
+        authorID: "any_id",
+        questionID: "any_id",
+        content: "any_content"
     })
 
-    console.log(answer)
-    expect(answer.content).toEqual("Answer")
+    expect(answer.content).toBe("any_content")
 })

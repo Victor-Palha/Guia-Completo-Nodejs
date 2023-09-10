@@ -13,7 +13,8 @@ export class InMemory implements UserRepository{
             name: data.name,
             email: data.email,
             password_hash: data.password_hash,
-            created_at: new Date()
+            created_at: new Date(),
+            role: data.role? data.role : "USER"
         }
         
 
