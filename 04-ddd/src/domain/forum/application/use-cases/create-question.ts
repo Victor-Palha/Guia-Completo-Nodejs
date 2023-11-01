@@ -11,7 +11,7 @@ interface CreateQuestionDTO{
 interface CreateQuestionResponse{
     question: Question
 }
-export class CreateQuestion{
+export class CreateQuestionUseCase{
     constructor(
         private QuestionRepository: QuestionRepository
     ){}
