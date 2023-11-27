@@ -1,0 +1,11 @@
+{
+    "material-icon-theme.languages.associations": {
+
+    },
+    "material-icon-theme.files.associations": {
+        "*.controller.ts": "http",
+        "*.service.ts": "Brainfuck",
+        "*.pipes.ts": "Nest-pipe",
+        "*.env": "Key"
+    }
+}
