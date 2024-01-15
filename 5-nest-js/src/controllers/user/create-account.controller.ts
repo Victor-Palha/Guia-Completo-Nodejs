@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UsePipes } from "@nestjs/common";
+import { BadRequestException, Body, Controller, HttpCode, Post, UsePipes } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { User } from "@prisma/client";
 import { ConflictException } from "@nestjs/common";
@@ -24,6 +24,7 @@ export class CreateAccountController{
     constructor(private readonly prisma: PrismaService){}
 
     @Post()
+    @HttpCode(201)
     @UsePipes(new ZodValidationPipe(createAccountSchema))
     async execute(@Body() body: CreateAccountRequest): Promise<CreateAccountResponse>{
 
