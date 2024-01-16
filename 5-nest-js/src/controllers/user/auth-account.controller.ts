@@ -1,5 +1,7 @@
-import { Body, Controller, NotFoundException, Post } from "@nestjs/common";
+import { Body, Controller, NotFoundException, Post, UsePipes } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { compare, hash } from "bcryptjs";
+import { ZodValidationPipe } from "src/pipes/zod-validation.pipes";
 import { PrismaService } from "src/prisma/prisma.service";
 import { z } from "zod";
 // Validation
@@ -12,9 +14,13 @@ type AuthAccountRequest = z.infer<typeof authAccountSchema>;
 
 @Controller("/accounts")
 export class AuthAccountController{
-    constructor(private readonly prisma: PrismaService){}
+    constructor(
+        private jwt: JwtService,
+        private readonly prisma: PrismaService
+    ){}
 
     @Post("/auth")
+    @UsePipes(new ZodValidationPipe(authAccountSchema))
     async execute(@Body() body: AuthAccountRequest){
         const {email, password} = body;
         //find User
@@ -32,9 +38,10 @@ export class AuthAccountController{
         if(!verifyPass){
             throw new NotFoundException("Email or password incorrect.")
         }
+        const token = await this.jwt.signAsync({sub: user.id})
 
         return {
-            message: "User authenticated successfully."
+            token
         }
     }
 }

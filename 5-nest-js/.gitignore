@@ -38,6 +38,5 @@ lerna-debug.log*
 .env
 # PEM
 *.pem
-
 #Docker
 data
