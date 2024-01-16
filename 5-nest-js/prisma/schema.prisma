@@ -22,7 +22,7 @@ model User {
 }
 
 model Question {
-  id String @default(cuid()) @id
+  id String @default(uuid()) @id
   title String
   slug String @unique
   content String
