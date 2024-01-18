@@ -1,10 +1,10 @@
 import { BadRequestException, Body, Controller, HttpCode, Post, UsePipes } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "@/prisma/prisma.service";
 import { User } from "@prisma/client";
 import { ConflictException } from "@nestjs/common";
 import { z } from "zod";
 import {hash} from "bcryptjs"
-import { ZodValidationPipe } from "src/pipes/zod-validation.pipes";
+import { ZodValidationPipe } from "@/pipes/zod-validation.pipes";
 
 
 const createAccountSchema = z.object({

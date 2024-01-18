@@ -1,8 +1,8 @@
 import { Body, Controller, NotFoundException, Post, UsePipes } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { compare, hash } from "bcryptjs";
-import { ZodValidationPipe } from "src/pipes/zod-validation.pipes";
-import { PrismaService } from "src/prisma/prisma.service";
+import { ZodValidationPipe } from "@/pipes/zod-validation.pipes";
+import { PrismaService } from "@/prisma/prisma.service";
 import { z } from "zod";
 // Validation
 const authAccountSchema = z.object({
